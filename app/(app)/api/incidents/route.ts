@@ -5,6 +5,92 @@ import { IncidentInput } from '../../../../lib/validation/incident'
 import { revalidatePath } from 'next/cache'
 import { checkRateLimit, recordSubmission } from '../../../../lib/rate-limit'
 
+export async function GET(request: NextRequest) {
+  const supabase = createSupabaseServer();
+  const { searchParams } = new URL(request.url);
+
+  const gameSlug = searchParams.get('game');
+  const playerIdentifier = searchParams.get('player');
+  const limit = parseInt(searchParams.get('limit') || '50');
+
+  if (!gameSlug || !playerIdentifier) {
+    return NextResponse.json(
+      { error: 'Missing required parameters: game and player' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // Get game ID from slug
+    const { data: game } = await supabase
+      .from('games')
+      .select('id')
+      .eq('slug', gameSlug)
+      .single();
+
+    if (!game) {
+      return NextResponse.json({ incidents: [] });
+    }
+
+    // Get player
+    const { data: player } = await supabase
+      .from('players')
+      .select('id')
+      .eq('game_id', game.id)
+      .eq('identifier', playerIdentifier)
+      .single();
+
+    if (!player) {
+      return NextResponse.json({ incidents: [] });
+    }
+
+    // Fetch incidents for this player
+    const { data: incidents, error } = await supabase
+      .from('incidents')
+      .select(`
+        id,
+        description,
+        severity,
+        status,
+        created_at,
+        category_id,
+        incident_categories (
+          name
+        )
+      `)
+      .eq('reported_player_id', player.id)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('Error fetching incidents:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch incidents' },
+        { status: 500 }
+      );
+    }
+
+    // Format the response
+    const formattedIncidents = (incidents || []).map((inc: any) => ({
+      id: inc.id,
+      description: inc.description,
+      severity: inc.severity,
+      status: inc.status,
+      created_at: inc.created_at,
+      category_id: inc.category_id,
+      category_name: inc.incident_categories?.name || 'Unknown',
+    }));
+
+    return NextResponse.json({ incidents: formattedIncidents });
+  } catch (error) {
+    console.error('Incidents API error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
 export const POST = withErrorHandling(async (req: NextRequest) => {
   const supabase = createSupabaseServer()
   const supabaseAdmin = createSupabaseAdmin()

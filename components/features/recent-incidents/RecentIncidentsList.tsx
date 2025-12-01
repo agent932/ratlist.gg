@@ -1,4 +1,6 @@
 import { Card } from '@/components/ui/card';
+import { formatPlayerName } from '@/lib/utils/player';
+import { CATEGORY_COLORS } from '@/lib/constants/colors';
 
 interface RecentIncident {
   id: string;
@@ -21,15 +23,6 @@ export function RecentIncidentsList({ incidents }: RecentIncidentsListProps) {
     return <Card className="p-6 text-center text-slate-500">No recent incidents</Card>;
   }
 
-  const categoryColors: Record<string, string> = {
-    'Betrayal': 'bg-red-500/10 text-red-400 border-red-500/20',
-    'Toxicity': 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-    'Scamming': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-    'Teaming': 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-    'Cheating': 'bg-pink-500/10 text-pink-400 border-pink-500/20',
-    'Positive': 'bg-green-500/10 text-green-400 border-green-500/20',
-  };
-
   return (
     <div className="space-y-4">
       {incidents.map((incident) => {
@@ -44,7 +37,7 @@ export function RecentIncidentsList({ incidents }: RecentIncidentsListProps) {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs text-white/40">{incident.game_name || 'Unknown Game'}</span>
                 <span className="text-white/20">•</span>
-                <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${categoryColors[incident.category_label] || 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
+                <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${CATEGORY_COLORS[incident.category_label as keyof typeof CATEGORY_COLORS] || 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
                   {incident.category_label}
                 </span>
                 <span className="text-white/20">•</span>
@@ -52,7 +45,7 @@ export function RecentIncidentsList({ incidents }: RecentIncidentsListProps) {
                   href={`/player/${gameSlug}/${encodeURIComponent(incident.player_identifier)}`}
                   className="text-sm font-semibold text-white/90 hover:text-brand transition-colors"
                 >
-                  {incident.player_display_name || incident.player_identifier}
+                  {formatPlayerName(incident.player_display_name || incident.player_identifier)}
                 </a>
               </div>
               <span className="text-xs text-white/40 whitespace-nowrap">

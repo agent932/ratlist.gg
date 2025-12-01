@@ -1,6 +1,7 @@
 import { createSupabaseServer } from '../../../../../lib/supabase/server'
 import { tierFromScore } from '../../../../../lib/reputation'
 import { Card } from '../../../../../components/ui/card'
+import { VerifiedBadge } from '../../../../../components/features/player/VerifiedBadge'
 
 type Props = { params: { game: string; playerId: string } }
 
@@ -34,11 +35,17 @@ export default async function PlayerPage({ params }: Props) {
     </div>
   )
 
-  const { data: rep } = await supabase
+  // Check if player is linked to a user account
+  const { data: ownership } = await supabase.rpc('fn_get_player_ownership', {
+    target_player_id: playerRow.identifier,
+    target_game_id: gameRow.id,
+  }).maybeSingle()
+
+  const rep = await supabase
     .rpc('fn_get_player_profile', { game_slug: params.game, identifier: playerRow.identifier })
     .maybeSingle()
 
-  const repAny = rep as any
+  const repAny = rep.data as any
   const tier = repAny ? tierFromScore(repAny.score) : 'B'
   const tierColors: Record<string, string> = {
     'S': 'text-green-400',
@@ -78,9 +85,17 @@ export default async function PlayerPage({ params }: Props) {
             Player Profile
           </div>
           
-          <h1 className="text-4xl sm:text-5xl font-bold mb-2">
-            {playerRow.display_name || playerRow.identifier}
-          </h1>
+          <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+            <h1 className="text-4xl sm:text-5xl font-bold">
+              {playerRow.display_name || playerRow.identifier}
+            </h1>
+            {ownership && (ownership as any).display_name && (
+              <VerifiedBadge 
+                username={(ownership as any).display_name} 
+                linkedAt={(ownership as any).linked_at}
+              />
+            )}
+          </div>
           
           <div className="flex flex-wrap items-center gap-4 text-white/60">
             <span className="flex items-center gap-2">
