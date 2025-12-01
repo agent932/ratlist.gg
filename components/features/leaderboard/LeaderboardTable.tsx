@@ -2,6 +2,8 @@ import { Card } from '@/components/ui/card';
 
 interface LeaderboardEntry {
   player_id: string;
+  identifier: string;
+  display_name: string | null;
   report_count: number;
   score: number;
 }
@@ -32,7 +34,7 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
           {entries.map((entry, idx) => (
             <tr key={entry.player_id} className="border-b border-slate-800">
               <td className="py-3">{idx + 1}</td>
-              <td className="py-3 font-mono text-sm">{entry.player_id}</td>
+              <td className="py-3 font-mono text-sm">{entry.display_name || entry.identifier}</td>
               <td className="py-3 text-right">{entry.report_count}</td>
               <td
                 className={`py-3 text-right font-semibold ${

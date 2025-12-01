@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withErrorHandling, badRequest, unauthorized } from '../../../../lib/http'
-import { createSupabaseServer } from '../../../../lib/supabase/server'
+import { createSupabaseServer, createSupabaseAdmin } from '../../../../lib/supabase/server'
 import { IncidentInput } from '../../../../lib/validation/incident'
 import { revalidatePath } from 'next/cache'
 import { checkRateLimit, recordSubmission } from '../../../../lib/rate-limit'
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
   const supabase = createSupabaseServer()
+  const supabaseAdmin = createSupabaseAdmin()
   
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return unauthorized('Sign in required')
@@ -20,8 +21,8 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
   const { game_id, identifier, category_id, occurred_at, description, region, mode, map, is_anonymous } = parsed.data
 
-  // Upsert player
-  const { data: existingPlayer } = await supabase
+  // Upsert player using admin client (bypasses RLS)
+  const { data: existingPlayer } = await supabaseAdmin
     .from('players')
     .select('id')
     .eq('game_id', game_id)
@@ -30,7 +31,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
   let playerId = existingPlayer?.id
   if (!playerId) {
-    const { data: newPlayer, error: playerError } = await supabase
+    const { data: newPlayer, error: playerError } = await supabaseAdmin
       .from('players')
       .insert({ game_id, identifier, display_name: identifier })
       .select('id')

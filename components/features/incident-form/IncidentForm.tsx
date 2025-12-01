@@ -24,11 +24,13 @@ export function IncidentForm({ games, categories }: Props) {
     setSuccess(false)
 
     const formData = new FormData(e.currentTarget)
+    const occurredAt = formData.get('occurred_at') as string
+    
     const payload = {
       game_id: formData.get('game_id'),
       identifier: formData.get('identifier'),
       category_id: parseInt(formData.get('category_id') as string),
-      occurred_at: formData.get('occurred_at') || undefined,
+      occurred_at: occurredAt ? new Date(occurredAt).toISOString() : undefined,
       description: formData.get('description'),
       region: formData.get('region') || undefined,
       mode: formData.get('mode') || undefined,
@@ -42,15 +44,22 @@ export function IncidentForm({ games, categories }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      const data = await res.json()
+      
       if (!res.ok) {
-        setError(data.error?.message || 'Failed to submit')
+        const data = await res.json().catch(() => ({ error: { message: 'Unknown error' } }))
+        setError(data.error?.message || `Error: ${res.status}`)
       } else {
+        const data = await res.json()
         setSuccess(true)
         e.currentTarget.reset()
+        // Redirect to player page after short delay
+        setTimeout(() => {
+          window.location.href = `/player/${formData.get('game_id')}/${formData.get('identifier')}`
+        }, 2000)
       }
     } catch (err) {
-      setError('Network error')
+      setError('Network error - please check your connection and try again')
+      console.error('Submission error:', err)
     } finally {
       setLoading(false)
     }
@@ -59,7 +68,7 @@ export function IncidentForm({ games, categories }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && <div className="rounded bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400">{error}</div>}
-      {success && <div className="rounded bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-400">Incident submitted!</div>}
+      {success && <div className="rounded bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-400">Incident submitted successfully! Redirecting to player profile...</div>}
 
       <div>
         <label className="block text-sm font-medium mb-1">Game</label>

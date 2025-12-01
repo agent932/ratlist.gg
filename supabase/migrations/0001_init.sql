@@ -112,11 +112,13 @@ $$;
 create or replace function public.fn_get_leaderboard(game_slug text, period text)
 returns table (
   player_id uuid,
+  identifier text,
+  display_name text,
   report_count bigint,
   score integer
 ) language sql stable as $$
   with base as (
-    select p.id as player_id, i.created_at,
+    select p.id as player_id, p.identifier, p.display_name,
       sum(case c.slug
         when 'betrayal' then -5
         when 'extract-camping' then -3
@@ -130,14 +132,14 @@ returns table (
     join public.games g on g.id = i.game_id
     where g.slug = game_slug
       and (
-        period = 'week' and i.created_at >= now() - interval '7 days' or
-        period = 'month' and i.created_at >= now() - interval '30 days' or
-        period not in ('week','month')
+        (period = 'week' and i.created_at >= now() - interval '7 days') or
+        (period = 'month' and i.created_at >= now() - interval '30 days') or
+        (period not in ('week','month'))
       )
-    group by p.id, i.created_at
+    group by p.id, p.identifier, p.display_name
   )
-  select player_id, sum(report_count) as report_count, sum(score) as score
-  from base group by player_id order by report_count desc limit 100;
+  select player_id, identifier, display_name, report_count, score
+  from base order by report_count desc limit 100;
 $$;
 
 -- RPC: recent incidents
@@ -145,13 +147,16 @@ create or replace function public.fn_get_recent_incidents(game_slug text, lim in
 returns table (
   id uuid,
   reported_player_id uuid,
+  player_identifier text,
+  player_display_name text,
   category_id smallint,
   description text,
   created_at timestamptz
 ) language sql stable as $$
-  select i.id, i.reported_player_id, i.category_id, i.description, i.created_at
+  select i.id, i.reported_player_id, p.identifier, p.display_name, i.category_id, i.description, i.created_at
   from public.incidents i
   join public.games g on g.id = i.game_id and g.slug = game_slug
+  join public.players p on p.id = i.reported_player_id
   order by i.created_at desc
   limit greatest(lim, 1);
 $$;

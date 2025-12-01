@@ -1,27 +1,123 @@
+'use client'
+
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
 
 export function Hero() {
   return (
-    <section className="container py-16">
-      <div className="mx-auto max-w-3xl text-center">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Ratlist.gg</h1>
-        <p className="mt-4 text-balance text-white/80">
-          Community incident board and reputation lookup for extraction shooters.
-        </p>
-        <div className="mt-8 flex items-center justify-center gap-3">
-          <Button asChild>
-            <a href="/report">Report an incident</a>
-          </Button>
-          <a className="rounded border border-white/10 px-4 py-2 hover:bg-white/5" href="/browse">
-            Browse the ratlist
-          </a>
-        </div>
-        <div className="mt-10">
-          <form action="/player/tarkov" className="mx-auto flex max-w-xl items-center gap-2">
-            <Input name="playerId" placeholder="Search player identifier..." />
-            <button className="rounded bg-white/10 px-3 py-2 hover:bg-white/20" type="submit">Search</button>
-          </form>
+    <section className="relative overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-brand/10 via-transparent to-transparent" />
+      
+      {/* Animated grid pattern */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+                           linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px)`,
+          backgroundSize: '4rem 4rem'
+        }} />
+      </div>
+
+      {/* Glowing orbs */}
+      <div className="absolute top-20 left-1/4 w-96 h-96 bg-brand/20 rounded-full blur-3xl opacity-20" />
+      <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl opacity-20" />
+
+      <div className="container relative py-24 sm:py-32">
+        <div className="mx-auto max-w-4xl text-center">
+          {/* Badge */}
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm backdrop-blur-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand"></span>
+            </span>
+            Community-Driven Reputation System
+          </div>
+
+          {/* Main heading with gradient */}
+          <h1 className="text-5xl font-bold tracking-tight sm:text-7xl">
+            <span className="bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
+              Know Your Team.
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-brand via-purple-400 to-brand bg-clip-text text-transparent">
+              Trust the Ratlist.
+            </span>
+          </h1>
+
+          <p className="mt-6 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+            Community incident board and reputation lookup for extraction shooters. 
+            Report suspicious players, track incidents, and make informed decisions.
+          </p>
+
+          {/* CTA buttons */}
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button asChild className="w-full sm:w-auto bg-brand hover:bg-brand/90 text-brand-foreground font-semibold px-8 py-6 text-lg">
+              <a href="/report">Report an Incident</a>
+            </Button>
+            <a 
+              className="w-full sm:w-auto rounded-lg border border-white/20 bg-white/5 px-8 py-6 text-lg font-semibold hover:bg-white/10 transition-colors backdrop-blur-sm" 
+              href="/browse"
+            >
+              Browse the Ratlist
+            </a>
+          </div>
+
+          {/* Search box */}
+          <div className="mt-16">
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault()
+                const formData = new FormData(e.currentTarget)
+                const playerId = formData.get('playerId') as string
+                if (playerId) {
+                  window.location.href = `/player/tarkov/${encodeURIComponent(playerId)}`
+                }
+              }} 
+              className="mx-auto flex max-w-2xl items-center gap-3"
+            >
+              <div className="relative flex-1">
+                <svg 
+                  className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <Input 
+                  name="playerId" 
+                  placeholder="Search player by identifier..." 
+                  required 
+                  className="pl-12 h-14 bg-white/5 border-white/10 backdrop-blur-sm text-lg"
+                />
+              </div>
+              <button 
+                className="h-14 rounded-lg bg-brand px-8 font-semibold text-brand-foreground hover:bg-brand/90 transition-colors" 
+                type="submit"
+              >
+                Search
+              </button>
+            </form>
+            <p className="mt-3 text-sm text-white/40">
+              Try searching: "Player123" or any in-game username
+            </p>
+          </div>
+
+          {/* Stats */}
+          <div className="mt-20 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+            <div className="rounded-lg border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <div className="text-3xl font-bold text-brand">1,000+</div>
+              <div className="mt-1 text-sm text-white/60">Reports Filed</div>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <div className="text-3xl font-bold text-brand">500+</div>
+              <div className="mt-1 text-sm text-white/60">Players Tracked</div>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+              <div className="text-3xl font-bold text-brand">24/7</div>
+              <div className="mt-1 text-sm text-white/60">Community Active</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
