@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card';
+import { formatPlayerName } from '@/lib/utils/player';
 
 interface LeaderboardEntry {
   player_id: string;
@@ -34,7 +35,7 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
           {entries.map((entry, idx) => (
             <tr key={entry.player_id} className="border-b border-slate-800">
               <td className="py-3 text-sm sm:text-base">{idx + 1}</td>
-              <td className="py-3 font-mono text-xs sm:text-sm truncate max-w-[150px] sm:max-w-none">{entry.display_name || entry.identifier}</td>
+              <td className="py-3 font-mono text-xs sm:text-sm truncate max-w-[150px] sm:max-w-none">{formatPlayerName(entry.display_name || entry.identifier)}</td>
               <td className="py-3 text-right text-sm sm:text-base">{entry.report_count}</td>
               <td
                 className={`py-3 text-right font-semibold text-sm sm:text-base ${

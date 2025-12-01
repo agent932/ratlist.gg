@@ -74,6 +74,10 @@ export default async function ReportPage() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-brand mt-0.5">•</span>
+              <span>EmbarkIDs (with # symbols) are truncated publicly but stored in full for accuracy</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-brand mt-0.5">•</span>
               <span>You can edit or delete reports within 15 minutes of submission</span>
             </li>
           </ul>

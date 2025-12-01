@@ -3,15 +3,42 @@
 import { useState, useEffect } from 'react'
 import { createSupabaseBrowser } from '@/lib/supabase/client'
 
+type UserRole = 'user' | 'moderator' | 'admin'
+
 export function Header() {
   const [user, setUser] = useState<any>(null)
+  const [userRole, setUserRole] = useState<UserRole>('user')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const supabase = createSupabaseBrowser()
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
+    async function loadUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      
+      if (user) {
+        // Fetch user role from profile
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single()
+        
+        if (profile?.role) {
+          setUserRole(profile.role as UserRole)
+        }
+      }
+    }
+    
+    loadUser()
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null)
+      if (session?.user) {
+        loadUser()
+      } else {
+        setUserRole('user')
+      }
     })
     return () => subscription.unsubscribe()
   }, [supabase])
@@ -57,6 +84,45 @@ export function Header() {
           >
             FAQ
           </a>
+          
+          {/* Dashboard Link (for logged-in users) */}
+          {user && (
+            <a 
+              href="/dashboard" 
+              className="px-4 py-2 rounded-lg text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              Dashboard
+            </a>
+          )}
+          
+          {/* Admin/Moderator Links */}
+          {user && (userRole === 'moderator' || userRole === 'admin') && (
+            <>
+              <div className="ml-2 h-6 w-px bg-white/10" />
+              <a 
+                href="/moderator/flags" 
+                className="px-4 py-2 rounded-lg text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-400/5 transition-colors"
+              >
+                Flags
+              </a>
+              {userRole === 'admin' && (
+                <>
+                  <a 
+                    href="/admin/dashboard" 
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
+                  >
+                    Dashboard
+                  </a>
+                  <a 
+                    href="/admin/audit" 
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
+                  >
+                    Audit
+                  </a>
+                </>
+              )}
+            </>
+          )}
           
           <div className="ml-2 h-6 w-px bg-white/10" />
           
@@ -133,6 +199,48 @@ export function Header() {
             >
               FAQ
             </a>
+            
+            {/* Dashboard Link Mobile */}
+            {user && (
+              <a 
+                href="/dashboard" 
+                className="px-4 py-2 rounded-lg text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+              >
+                Dashboard
+              </a>
+            )}
+            
+            {/* Admin/Moderator Links Mobile */}
+            {user && (userRole === 'moderator' || userRole === 'admin') && (
+              <>
+                <div className="my-2 h-px bg-white/10" />
+                <div className="px-2 text-xs font-semibold text-white/40 uppercase tracking-wider">
+                  {userRole === 'admin' ? 'Admin' : 'Moderator'}
+                </div>
+                <a 
+                  href="/moderator/flags" 
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-400/5 transition-colors"
+                >
+                  Review Flags
+                </a>
+                {userRole === 'admin' && (
+                  <>
+                    <a 
+                      href="/admin/dashboard" 
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
+                    >
+                      Admin Dashboard
+                    </a>
+                    <a 
+                      href="/admin/audit" 
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
+                    >
+                      Audit Logs
+                    </a>
+                  </>
+                )}
+              </>
+            )}
             
             <div className="my-2 h-px bg-white/10" />
             

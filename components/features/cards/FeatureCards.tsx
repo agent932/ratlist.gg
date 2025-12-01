@@ -1,4 +1,4 @@
-import { Card } from '../../ui/card'
+import { Card } from '@/components/ui/card'
 
 export function FeatureCards() {
   const features = [
