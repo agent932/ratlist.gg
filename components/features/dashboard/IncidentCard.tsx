@@ -1,4 +1,5 @@
 // T002: Reusable IncidentCard component for dashboard
+import { memo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
@@ -24,7 +25,7 @@ interface IncidentCardProps {
   showModerationInfo?: boolean;
 }
 
-export function IncidentCard({ incident, showModerationInfo = false }: IncidentCardProps) {
+function IncidentCardComponent({ incident, showModerationInfo = false }: IncidentCardProps) {
   const severityColor = SEVERITY_COLORS[incident.severity as keyof typeof SEVERITY_COLORS] || SEVERITY_COLORS.low;
   const statusColor = STATUS_COLORS[incident.status as keyof typeof STATUS_COLORS] || STATUS_COLORS.active;
 
@@ -102,3 +103,5 @@ export function IncidentCard({ incident, showModerationInfo = false }: IncidentC
     </Card>
   );
 }
+
+export const IncidentCard = memo(IncidentCardComponent);
