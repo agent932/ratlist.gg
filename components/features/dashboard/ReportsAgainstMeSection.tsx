@@ -8,6 +8,15 @@ import { IncidentCard } from './IncidentCard';
 import Link from 'next/link';
 import { formatPlayerName } from '@/lib/utils/player';
 
+interface IncidentData {
+  id: string;
+  status: string;
+  category_name?: string;
+  severity?: string;
+  description?: string;
+  created_at: string;
+}
+
 interface LinkedPlayerWithIncidents {
   player_id: string;
   game_name: string;
@@ -63,7 +72,7 @@ export function ReportsAgainstMeSection() {
             if (incidentsResponse.ok) {
               const incidentsData = await incidentsResponse.json();
               const activeIncidents = (incidentsData.incidents || []).filter(
-                (inc: any) => inc.status === 'active'
+                (inc: IncidentData) => inc.status === 'active'
               );
 
               if (activeIncidents.length > 0) {
@@ -73,7 +82,7 @@ export function ReportsAgainstMeSection() {
                   game_slug: player.game_slug,
                   tier: player.tier || 'F',
                   incident_count: activeIncidents.length,
-                  incidents: activeIncidents.map((inc: any) => ({
+                  incidents: activeIncidents.map((inc: IncidentData) => ({
                     id: inc.id,
                     player_id: player.player_id,
                     game_name: player.game_name,

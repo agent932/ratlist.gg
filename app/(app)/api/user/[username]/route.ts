@@ -1,8 +1,8 @@
-// T011: Get user profile data API
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { getCurrentUserWithRole } from '@/lib/auth/guards';
 import { rateLimit, rateLimitedResponse, publicRateLimiter } from '@/lib/rate-limit';
+import type { LinkedPlayer } from '@/lib/types';
 
 export async function GET(
   request: NextRequest,
@@ -46,12 +46,34 @@ export async function GET(
     
     // Calculate aggregate stats
     const totalIncidents = linkedPlayers?.reduce(
-      (sum: number, player: any) => sum + (player.incident_count || 0),
+      (sum: number, player: LinkedPlayer) => sum + (player.incident_count || 0),
       0
     ) || 0;
     
     // Build response with public data
-    const responseData: any = {
+    interface UserProfileResponse {
+      display_name: string | null;
+      role: string;
+      joined_at: string;
+      linked_players: LinkedPlayer[];
+      stats: {
+        total_linked_players: number;
+        total_incidents: number;
+      };
+      private?: {
+        email?: string;
+        email_notifications: boolean;
+        last_notification_sent?: string | null;
+      };
+      admin?: {
+        user_id: string;
+        suspended_until: string | null;
+        suspension_reason: string | null;
+        is_suspended: boolean;
+      };
+    }
+
+    const responseData: UserProfileResponse = {
       display_name: profile.display_name,
       role: profile.role,
       joined_at: profile.created_at,

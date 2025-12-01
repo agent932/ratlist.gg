@@ -51,6 +51,16 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch incidents for this player
+    interface IncidentQueryResult {
+      id: string;
+      description: string;
+      severity: string;
+      status: string;
+      created_at: string;
+      category_id: number;
+      incident_categories: { name: string } | null;
+    }
+
     const { data: incidents, error } = await supabase
       .from('incidents')
       .select(`
@@ -66,7 +76,8 @@ export async function GET(request: NextRequest) {
       `)
       .eq('reported_player_id', player.id)
       .order('created_at', { ascending: false })
-      .limit(limit);
+      .limit(limit)
+      .returns<IncidentQueryResult[]>();
 
     if (error) {
       console.error('Error fetching incidents:', error);
@@ -77,7 +88,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Format the response
-    const formattedIncidents = (incidents || []).map((inc: any) => ({
+    const formattedIncidents = (incidents || []).map((inc: IncidentQueryResult) => ({
       id: inc.id,
       description: inc.description,
       severity: inc.severity,

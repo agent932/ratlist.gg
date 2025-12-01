@@ -13,8 +13,8 @@ export function withErrorHandling(
     try {
       const res = await handler(req)
       return res
-    } catch (e: any) {
-      log({ name: 'route.error', level: 'error', traceId: t, props: { message: e?.message } })
+    } catch (e: unknown) {
+      log({ name: 'route.error', level: 'error', traceId: t, props: { message: (e as Error)?.message } })
       return NextResponse.json(errorShape('Unexpected error', t), { status: 500 })
     }
   }

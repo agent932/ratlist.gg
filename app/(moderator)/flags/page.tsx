@@ -5,6 +5,7 @@ import { createSupabaseServer } from '@/lib/supabase/server';
 import { FlagQueueTable } from '@/components/features/moderation/FlagQueueTable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
+import type { Flag } from '@/lib/types';
 
 export const metadata = {
   title: 'Flag Queue | Moderation',
@@ -51,18 +52,18 @@ export default async function FlagQueuePage({
       <Tabs defaultValue={activeTab} className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="open">
-            Open ({flags.filter((f: any) => f.flag_status === 'open').length})
+            Open ({flags.filter((f: Flag) => f.flag_status === 'open').length})
           </TabsTrigger>
           <TabsTrigger value="closed">Reviewed</TabsTrigger>
           <TabsTrigger value="all">All Flags</TabsTrigger>
         </TabsList>
 
         <TabsContent value="open">
-          <FlagQueueTable flags={flags.filter((f: any) => f.flag_status === 'open')} />
+          <FlagQueueTable flags={flags.filter((f: Flag) => f.flag_status === 'open')} />
         </TabsContent>
 
         <TabsContent value="closed">
-          <FlagQueueTable flags={flags.filter((f: any) => f.flag_status === 'closed')} />
+          <FlagQueueTable flags={flags.filter((f: Flag) => f.flag_status === 'closed')} />
         </TabsContent>
 
         <TabsContent value="all">

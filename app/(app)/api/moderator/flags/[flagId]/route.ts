@@ -90,7 +90,7 @@ export async function PATCH(
     // Use admin client for update
     const supabase = createSupabaseAdmin();
     
-    const updateData: any = {
+    const updateData: Record<string, string> = {
       status,
       reviewed_by: currentUser.id,
       reviewed_at: new Date().toISOString(),
