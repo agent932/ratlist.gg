@@ -28,16 +28,33 @@ export function Header() {
         if (profile?.role) {
           setUserRole(profile.role as UserRole)
         }
+      } else {
+        // Reset role when user signs out
+        setUserRole('user')
       }
     }
     
     loadUser()
     
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        loadUser()
-      } else {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        // Immediately update user state and fetch role
+        const currentUser = session?.user ?? null
+        setUser(currentUser)
+        
+        if (currentUser) {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('role')
+            .eq('user_id', currentUser.id)
+            .single()
+          
+          if (profile?.role) {
+            setUserRole(profile.role as UserRole)
+          }
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null)
         setUserRole('user')
       }
     })
