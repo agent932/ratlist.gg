@@ -29,6 +29,14 @@ export async function POST(
     const body = await request.json();
     
     const { duration, reason } = suspensionSchema.parse(body);
+    
+    // Prevent self-suspension
+    if (currentUser.id === userId) {
+      return NextResponse.json(
+        { error: 'Cannot suspend yourself' },
+        { status: 403 }
+      );
+    }
 
     // Calculate suspension end time
     const now = new Date();
@@ -139,6 +147,15 @@ export async function DELETE(
     }
 
     const userId = params.userId;
+    
+    // Prevent self-unsuspension (though this would be rare)
+    if (currentUser.id === userId) {
+      return NextResponse.json(
+        { error: 'Cannot unsuspend yourself' },
+        { status: 403 }
+      );
+    }
+    
     const supabase = createSupabaseAdmin();
     
     const { data, error } = await supabase

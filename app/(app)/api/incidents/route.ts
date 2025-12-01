@@ -3,9 +3,15 @@ import { withErrorHandling, badRequest, unauthorized } from '../../../../lib/htt
 import { createSupabaseServer, createSupabaseAdmin } from '../../../../lib/supabase/server'
 import { IncidentInput } from '../../../../lib/validation/incident'
 import { revalidatePath } from 'next/cache'
-import { checkRateLimit, recordSubmission } from '../../../../lib/rate-limit'
+import { checkRateLimit, recordSubmission, rateLimit, rateLimitedResponse, publicRateLimiter, mutationRateLimiter } from '../../../../lib/rate-limit'
 
 export async function GET(request: NextRequest) {
+  // Apply rate limiting to prevent scraping
+  const allowed = await rateLimit(request, publicRateLimiter);
+  if (!allowed) {
+    return rateLimitedResponse();
+  }
+
   const supabase = createSupabaseServer();
   const { searchParams } = new URL(request.url);
 
