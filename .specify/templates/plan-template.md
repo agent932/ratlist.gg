@@ -31,7 +31,13 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- Security Baseline: auth required for non-static endpoints; input validation; secret management; TLS.
+- Accessibility & UX: WCAG 2.1 AA for primary flows; keyboard navigation; responsive layout.
+- Testing & CI: unit tests for P1 logic; one E2E happy path per P1 story; CI blocks on fail.
+- Observability & Health: structured logs; global error shape; health endpoint; error tracking.
+- Performance & Simplicity: CWV targets (LCP/INP/CLS); p95 backend latency; minimal dependencies.
+- Community Content Policy (if feature touches UGC): disclaimers present; PII/slur/threat filters; flag/appeal path.
+- Product Scope alignment: per-game reputation; required incident fields when applicable.
 
 ## Project Structure
 

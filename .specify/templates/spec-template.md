@@ -113,3 +113,11 @@
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+
+## Safety & Fairness *(mandatory for UGC features)*
+
+- **Policy Compliance**: Feature MUST include disclaimers that content is user-generated opinion and not an official moderation tool.
+- **Boundaries**: Prohibit PII, doxxing, slurs, and threats; define UI copy and validation aligned with policy.
+- **Flagging & Appeals**: Provide a user-visible mechanism to flag content and request review/removal (manual flow acceptable initially).
+- **Per-Game Reputation**: If reputation is displayed, ensure it is per game with descriptive, non-defamatory tiers.
+- **Anti-Harassment**: UX should discourage brigading and targeted abuse.

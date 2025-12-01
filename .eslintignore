@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+*.min.js
+.eslintrc.json
+next-env.d.ts
+playwright-report/
+test-results/
+.supabase/
