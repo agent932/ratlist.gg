@@ -1,7 +1,7 @@
 // T011: MyIncidentsSection component
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { IncidentCard } from './IncidentCard';
@@ -37,11 +37,7 @@ export function MyIncidentsSection() {
   const [hasMore, setHasMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
 
-  useEffect(() => {
-    fetchIncidents();
-  }, [activeFilter, page]);
-
-  async function fetchIncidents() {
+  const fetchIncidents = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(
@@ -54,11 +50,15 @@ export function MyIncidentsSection() {
         setTotalCount(data.total_count || 0);
       }
     } catch (error) {
-      console.error('Failed to fetch incidents:', error);
+      console.error('Error fetching incidents:', error);
     } finally {
       setLoading(false);
     }
-  }
+  }, [activeFilter, page]);
+
+  useEffect(() => {
+    fetchIncidents();
+  }, [fetchIncidents]);
 
   function handleFilterChange(filterId: string) {
     setActiveFilter(filterId);
