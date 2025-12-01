@@ -86,9 +86,14 @@ export function FlagQueueTable({ flags }: FlagQueueTableProps) {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-4" role="list" aria-label="Flag queue items">
         {flags.map((flag) => (
-          <Card key={flag.flag_id} className="p-6 border-white/10 bg-white/5">
+          <div 
+            key={flag.flag_id}
+            role="listitem"
+            aria-label={`Flag for ${formatPlayerName(flag.reported_player_identifier)} in ${flag.game_name}`}
+          >
+            <Card className="p-6 border-white/10 bg-white/5">
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -112,12 +117,13 @@ export function FlagQueueTable({ flags }: FlagQueueTableProps) {
               </div>
 
               {flag.flag_status === 'open' && (
-                <div className="flex gap-2">
+                <div className="flex gap-2" role="group" aria-label="Flag actions">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => openConfirmation(flag, 'dismiss')}
                     disabled={isLoading}
+                    aria-label={`Dismiss flag for ${formatPlayerName(flag.reported_player_identifier)}`}
                   >
                     Dismiss
                   </Button>
@@ -126,6 +132,7 @@ export function FlagQueueTable({ flags }: FlagQueueTableProps) {
                     variant="destructive"
                     onClick={() => openConfirmation(flag, 'remove')}
                     disabled={isLoading}
+                    aria-label={`Remove incident for ${formatPlayerName(flag.reported_player_identifier)}`}
                   >
                     Remove Incident
                   </Button>
@@ -155,7 +162,8 @@ export function FlagQueueTable({ flags }: FlagQueueTableProps) {
                 )}
               </div>
             </div>
-          </Card>
+            </Card>
+          </div>
         ))}
       </div>
 

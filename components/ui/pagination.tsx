@@ -43,8 +43,12 @@ export function Pagination({
   }
 
   return (
-    <div className="flex items-center justify-between border-t border-white/10 pt-4">
-      <div className="text-sm text-white/60">
+    <nav 
+      className="flex items-center justify-between border-t border-white/10 pt-4"
+      role="navigation"
+      aria-label="Pagination"
+    >
+      <div className="text-sm text-white/60" aria-live="polite" aria-atomic="true">
         Showing {startItem} to {endItem} of {totalItems} results
       </div>
       <div className="flex items-center gap-2">
@@ -53,10 +57,12 @@ export function Pagination({
           size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1 || loading}
+          aria-label={`Go to previous page (page ${currentPage - 1})`}
+          aria-disabled={currentPage === 1 || loading}
         >
           Previous
         </Button>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1" role="list">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
             // Show first page, last page, current page, and pages around current
             const showPage =
@@ -68,7 +74,11 @@ export function Pagination({
             if (!showPage) {
               if (page === currentPage - 2 || page === currentPage + 2) {
                 return (
-                  <span key={page} className="px-2 text-white/40">
+                  <span 
+                    key={page} 
+                    className="px-2 text-white/40"
+                    aria-hidden="true"
+                  >
                     ...
                   </span>
                 );
@@ -88,6 +98,9 @@ export function Pagination({
                     ? 'bg-brand text-white'
                     : 'border-white/20'
                 }
+                aria-label={`Go to page ${page}`}
+                aria-current={page === currentPage ? 'page' : undefined}
+                role="listitem"
               >
                 {page}
               </Button>
@@ -99,10 +112,12 @@ export function Pagination({
           size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages || loading}
+          aria-label={`Go to next page (page ${currentPage + 1})`}
+          aria-disabled={currentPage === totalPages || loading}
         >
           Next
         </Button>
       </div>
-    </div>
+    </nav>
   );
 }

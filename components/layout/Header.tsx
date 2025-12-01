@@ -66,7 +66,7 @@ export function Header() {
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
           <a 
             href="/browse" 
             className="px-4 py-2 rounded-lg text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 transition-colors"
@@ -99,10 +99,11 @@ export function Header() {
           {/* Admin/Moderator Links */}
           {user && (userRole === 'moderator' || userRole === 'admin') && (
             <>
-              <div className="ml-2 h-6 w-px bg-white/10" />
+              <div className="ml-2 h-6 w-px bg-white/10" aria-hidden="true" />
               <a 
                 href="/moderator/flags" 
                 className="px-4 py-2 rounded-lg text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-400/5 transition-colors"
+                aria-label="Moderator flags queue"
               >
                 Flags
               </a>
@@ -111,12 +112,14 @@ export function Header() {
                   <a 
                     href="/admin/dashboard" 
                     className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
+                    aria-label="Admin dashboard"
                   >
                     Dashboard
                   </a>
                   <a 
                     href="/admin/audit" 
                     className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
+                    aria-label="Admin audit logs"
                   >
                     Audit
                   </a>
@@ -125,19 +128,21 @@ export function Header() {
             </>
           )}
           
-          <div className="ml-2 h-6 w-px bg-white/10" />
+          <div className="ml-2 h-6 w-px bg-white/10" aria-hidden="true" />
           
           {user ? (
             <div className="ml-2 flex items-center gap-2">
               <a 
                 href="/report" 
                 className="px-4 py-2 rounded-lg bg-brand hover:bg-brand/90 text-brand-foreground text-sm font-semibold transition-colors"
+                aria-label="Submit an incident report"
               >
                 Report
               </a>
               <button
                 onClick={signOut}
                 className="px-4 py-2 rounded-lg text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                aria-label="Sign out of your account"
               >
                 Sign Out
               </button>
@@ -153,6 +158,7 @@ export function Header() {
               <a 
                 href="/report" 
                 className="px-4 py-2 rounded-lg bg-brand hover:bg-brand/90 text-brand-foreground text-sm font-semibold transition-colors"
+                aria-label="Submit an incident report"
               >
                 Report
               </a>

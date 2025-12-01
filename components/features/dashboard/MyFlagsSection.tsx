@@ -93,12 +93,15 @@ export function MyFlagsSection() {
     <div className="space-y-6">
       {/* Filters */}
       <Card className="p-4 border-white/10 bg-white/5">
-        <div className="flex flex-wrap gap-2">
+        <nav role="navigation" aria-label="Flag resolution filters">
+          <div className="flex flex-wrap gap-2">
           {resolutionFilters.map((filter) => (
             <Button
               key={filter.id}
               onClick={() => handleFilterChange(filter.id)}
               variant={activeFilter === filter.id ? 'default' : 'outline'}
+              aria-label={`Filter by ${filter.label}`}
+              aria-current={activeFilter === filter.id ? 'true' : 'false'}
               className={
                 activeFilter === filter.id
                   ? 'bg-brand hover:bg-brand/90 text-brand-foreground'
@@ -108,8 +111,9 @@ export function MyFlagsSection() {
               {filter.label}
             </Button>
           ))}
-        </div>
-        <div className="mt-2 text-sm text-white/60">
+          </div>
+        </nav>
+        <div className="mt-2 text-sm text-white/60" aria-live="polite" aria-atomic="true">
           Showing {flags.length} of {totalCount} flags
         </div>
       </Card>

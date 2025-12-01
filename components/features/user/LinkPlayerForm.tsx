@@ -95,7 +95,7 @@ export function LinkPlayerForm({ onSuccess }: LinkPlayerFormProps) {
         Link your in-game player name to receive notifications when someone reports you
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" aria-label="Link player ID form">
         <div>
           <label htmlFor="game" className="block text-sm font-medium text-white/80 mb-2">
             Game
@@ -110,6 +110,7 @@ export function LinkPlayerForm({ onSuccess }: LinkPlayerFormProps) {
             }}
             className="w-full px-4 py-2 bg-black/30 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand"
             required
+            aria-required="true"
           >
             {games.map((game) => (
               <option key={game.id} value={game.id}>
@@ -131,9 +132,11 @@ export function LinkPlayerForm({ onSuccess }: LinkPlayerFormProps) {
             placeholder={EMBARK_ID_GAMES.includes(selectedGameSlug) ? "PlayerName#1234" : "Enter your player name"}
             className="w-full px-4 py-2 bg-black/30 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-brand"
             required
+            aria-required="true"
+            aria-describedby="playerId-help"
             maxLength={100}
           />
-          <p className="text-xs text-white/40 mt-1">
+          <p id="playerId-help" className="text-xs text-white/40 mt-1">
             {EMBARK_ID_GAMES.includes(selectedGameSlug) 
               ? 'Must include the # and numbers (e.g., PlayerName#1234)'
               : 'This should match exactly how your name appears in the game'}
@@ -141,13 +144,13 @@ export function LinkPlayerForm({ onSuccess }: LinkPlayerFormProps) {
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div role="alert" aria-live="assertive" className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
+          <div role="status" aria-live="polite" className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
             Player ID linked successfully! You&apos;ll now receive notifications for this player.
           </div>
         )}
@@ -156,6 +159,7 @@ export function LinkPlayerForm({ onSuccess }: LinkPlayerFormProps) {
           type="submit"
           disabled={isLoading || !playerId.trim() || !selectedGameId}
           className="w-full px-4 py-2 bg-brand hover:bg-brand/90 text-brand-foreground rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-busy={isLoading}
         >
           {isLoading ? 'Linking...' : 'Link Player'}
         </button>

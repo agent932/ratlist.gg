@@ -84,15 +84,35 @@ export function IncidentForm({ games, categories }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <div className="rounded bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400">{error}</div>}
-      {success && <div className="rounded bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-400">Incident submitted successfully! Redirecting to player profile...</div>}
+    <form onSubmit={handleSubmit} className="space-y-4" aria-label="Report an incident">
+      {error && (
+        <div 
+          className="rounded bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400" 
+          role="alert"
+          aria-live="assertive"
+        >
+          {error}
+        </div>
+      )}
+      {success && (
+        <div 
+          className="rounded bg-green-500/10 border border-green-500/20 p-3 text-sm text-green-400"
+          role="status"
+          aria-live="polite"
+        >
+          Incident submitted successfully! Redirecting to player profile...
+        </div>
+      )}
 
       <div>
-        <label className="block text-sm font-medium mb-1">Game</label>
+        <label htmlFor="game-select" className="block text-sm font-medium mb-1">
+          Game
+        </label>
         <select 
+          id="game-select"
           name="game_id" 
           required 
+          aria-required="true"
           className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 outline-none ring-brand/50 focus:ring"
           onChange={(e) => {
             const game = games.find(g => g.id === e.target.value);
@@ -108,7 +128,11 @@ export function IncidentForm({ games, categories }: Props) {
 
       {/* Show EmbarkID privacy notice when applicable game is selected */}
       {selectedGameSlug && EMBARK_ID_GAMES.includes(selectedGameSlug) && (
-        <div className="flex items-start gap-3 rounded-lg border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-300">
+        <div 
+          className="flex items-start gap-3 rounded-lg border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-300"
+          role="note"
+          aria-label="Privacy notice for EmbarkID"
+        >
           <svg className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
@@ -121,24 +145,35 @@ export function IncidentForm({ games, categories }: Props) {
       )}
 
       <div>
-        <label className="block text-sm font-medium mb-1">
+        <label htmlFor="player-identifier" className="block text-sm font-medium mb-1">
           {EMBARK_ID_GAMES.includes(selectedGameSlug) ? 'EmbarkID' : 'Player identifier'}
         </label>
         <Input 
+          id="player-identifier"
           name="identifier" 
           placeholder={EMBARK_ID_GAMES.includes(selectedGameSlug) ? "PlayerName#1234" : "PlayerName123"}
           required 
+          aria-required="true"
+          aria-describedby={EMBARK_ID_GAMES.includes(selectedGameSlug) ? "identifier-help" : undefined}
         />
         {EMBARK_ID_GAMES.includes(selectedGameSlug) && (
-          <p className="text-xs text-white/40 mt-1">
+          <p id="identifier-help" className="text-xs text-white/40 mt-1">
             Must include the # and numbers (e.g., PlayerName#1234)
           </p>
         )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Incident category</label>
-        <select name="category_id" required className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 outline-none ring-brand/50 focus:ring">
+        <label htmlFor="category-select" className="block text-sm font-medium mb-1">
+          Incident category
+        </label>
+        <select 
+          id="category-select"
+          name="category_id" 
+          required 
+          aria-required="true"
+          className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 outline-none ring-brand/50 focus:ring"
+        >
           <option value="">Select category</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>{c.label}</option>
@@ -147,44 +182,72 @@ export function IncidentForm({ games, categories }: Props) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">When did this happen? (optional)</label>
-        <Input name="occurred_at" type="datetime-local" />
+        <label htmlFor="occurred-at" className="block text-sm font-medium mb-1">
+          When did this happen? (optional)
+        </label>
+        <Input id="occurred-at" name="occurred_at" type="datetime-local" />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Description (10–2000 chars)</label>
+        <label htmlFor="description" className="block text-sm font-medium mb-1">
+          Description
+        </label>
         <textarea
+          id="description"
           name="description"
           rows={6}
           minLength={10}
           maxLength={2000}
           required
+          aria-required="true"
+          aria-describedby="description-help"
           placeholder="Describe what happened..."
           className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 outline-none ring-brand/50 focus:ring"
         />
+        <p id="description-help" className="text-xs text-white/40 mt-1">
+          10–2000 characters required
+        </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <fieldset className="grid gap-3 sm:grid-cols-3">
+        <legend className="sr-only">Optional incident metadata</legend>
         <div>
-          <label className="block text-sm font-medium mb-1">Region (optional)</label>
-          <Input name="region" placeholder="NA, EU, etc." />
+          <label htmlFor="region" className="block text-sm font-medium mb-1">
+            Region (optional)
+          </label>
+          <Input id="region" name="region" placeholder="NA, EU, etc." />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Mode (optional)</label>
-          <Input name="mode" placeholder="Solo, Squad, etc." />
+          <label htmlFor="mode" className="block text-sm font-medium mb-1">
+            Mode (optional)
+          </label>
+          <Input id="mode" name="mode" placeholder="Solo, Squad, etc." />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Map (optional)</label>
-          <Input name="map" placeholder="Customs, Factory, etc." />
+          <label htmlFor="map" className="block text-sm font-medium mb-1">
+            Map (optional)
+          </label>
+          <Input id="map" name="map" placeholder="Customs, Factory, etc." />
         </div>
-      </div>
+      </fieldset>
 
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" name="is_anonymous" className="rounded" />
+      <label htmlFor="is-anonymous" className="flex items-center gap-2 text-sm">
+        <input 
+          id="is-anonymous"
+          type="checkbox" 
+          name="is_anonymous" 
+          className="rounded"
+          aria-label="Submit this incident report anonymously"
+        />
         Submit anonymously
       </label>
 
-      <Button type="submit" disabled={loading}>
+      <Button 
+        type="submit" 
+        disabled={loading}
+        aria-busy={loading}
+        aria-label="Submit incident report"
+      >
         {loading ? 'Submitting...' : 'Submit incident'}
       </Button>
     </form>

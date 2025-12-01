@@ -22,13 +22,13 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
 
   return (
     <Card className="p-4 sm:p-6 overflow-x-auto">
-      <table className="w-full min-w-[500px]">
+      <table className="w-full min-w-[500px]" role="table" aria-label="Player leaderboard">
         <thead>
           <tr className="text-left border-b border-slate-700">
-            <th className="pb-2 text-sm sm:text-base">Rank</th>
-            <th className="pb-2 text-sm sm:text-base">Player</th>
-            <th className="pb-2 text-right text-sm sm:text-base">Reports</th>
-            <th className="pb-2 text-right text-sm sm:text-base">Score</th>
+            <th scope="col" className="pb-2 text-sm sm:text-base">Rank</th>
+            <th scope="col" className="pb-2 text-sm sm:text-base">Player</th>
+            <th scope="col" className="pb-2 text-right text-sm sm:text-base">Reports</th>
+            <th scope="col" className="pb-2 text-right text-sm sm:text-base">Score</th>
           </tr>
         </thead>
         <tbody>

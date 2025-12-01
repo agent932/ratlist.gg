@@ -25,7 +25,7 @@ export function AdminNav({ isAdmin = false }: { isAdmin?: boolean }) {
   );
 
   return (
-    <nav className="border-b border-white/10 bg-black/30 backdrop-blur-sm mb-8">
+    <nav className="border-b border-white/10 bg-black/30 backdrop-blur-sm mb-8" aria-label="Admin navigation">
       <div className="container mx-auto px-4">
         <div className="flex gap-6">
           {filteredItems.map((item) => {
@@ -34,6 +34,7 @@ export function AdminNav({ isAdmin = false }: { isAdmin?: boolean }) {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive ? 'page' : undefined}
                 className={cn(
                   'py-4 px-2 text-sm font-medium transition-colors border-b-2',
                   isActive
