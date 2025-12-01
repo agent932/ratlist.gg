@@ -73,7 +73,7 @@ export function Hero() {
                   window.location.href = `/player/tarkov/${encodeURIComponent(playerId)}`
                 }
               }} 
-              className="mx-auto flex max-w-2xl items-center gap-3"
+              className="mx-auto flex flex-col sm:flex-row max-w-2xl items-stretch gap-3"
             >
               <div className="relative flex-1">
                 <svg 
@@ -88,11 +88,11 @@ export function Hero() {
                   name="playerId" 
                   placeholder="Search player by identifier..." 
                   required 
-                  className="pl-12 h-14 bg-white/5 border-white/10 backdrop-blur-sm text-lg"
+                  className="pl-12 h-14 bg-white/5 border-white/10 backdrop-blur-sm text-base sm:text-lg w-full"
                 />
               </div>
               <button 
-                className="h-14 rounded-lg bg-brand px-8 font-semibold text-brand-foreground hover:bg-brand/90 transition-colors" 
+                className="h-14 rounded-lg bg-brand px-8 font-semibold text-brand-foreground hover:bg-brand/90 transition-colors whitespace-nowrap" 
                 type="submit"
               >
                 Search
@@ -104,18 +104,18 @@ export function Hero() {
           </div>
 
           {/* Stats */}
-          <div className="mt-20 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-            <div className="rounded-lg border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-              <div className="text-3xl font-bold text-brand">1,000+</div>
-              <div className="mt-1 text-sm text-white/60">Reports Filed</div>
+          <div className="mt-20 grid grid-cols-3 gap-3 sm:gap-8 max-w-2xl mx-auto">
+            <div className="rounded-lg border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl font-bold text-brand">1,000+</div>
+              <div className="mt-1 text-xs sm:text-sm text-white/60">Reports Filed</div>
             </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-              <div className="text-3xl font-bold text-brand">500+</div>
-              <div className="mt-1 text-sm text-white/60">Players Tracked</div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl font-bold text-brand">500+</div>
+              <div className="mt-1 text-xs sm:text-sm text-white/60">Players Tracked</div>
             </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-              <div className="text-3xl font-bold text-brand">24/7</div>
-              <div className="mt-1 text-sm text-white/60">Community Active</div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-sm">
+              <div className="text-2xl sm:text-3xl font-bold text-brand">24/7</div>
+              <div className="mt-1 text-xs sm:text-sm text-white/60">Community Active</div>
             </div>
           </div>
         </div>

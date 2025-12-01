@@ -100,8 +100,8 @@ export default async function PlayerPage({ params }: Props) {
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Incidents list */}
-          <div className="lg:col-span-2">
-            <h2 className="text-2xl font-semibold mb-4">Recent Incidents</h2>
+          <div className="lg:col-span-2 order-2 lg:order-1">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4">Recent Incidents</h2>
             
             {incidents && incidents.length > 0 ? (
               <div className="space-y-3">
@@ -130,8 +130,8 @@ export default async function PlayerPage({ params }: Props) {
           </div>
 
           {/* Reputation sidebar */}
-          <aside>
-            <h3 className="text-xl font-semibold mb-4">Reputation Summary</h3>
+          <aside className="order-1 lg:order-2">
+            <h3 className="text-lg sm:text-xl font-semibold mb-4">Reputation Summary</h3>
             
             <Card className="p-6 border-white/10 bg-white/5 backdrop-blur-sm space-y-4">
               <div>
