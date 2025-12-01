@@ -148,7 +148,7 @@ export function LinkPlayerForm({ onSuccess }: LinkPlayerFormProps) {
 
         {success && (
           <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
-            Player ID linked successfully! You'll now receive notifications for this player.
+            Player ID linked successfully! You&apos;ll now receive notifications for this player.
           </div>
         )}
 

@@ -5,12 +5,19 @@ import { createSupabaseServer } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/card';
 import type { ModerationLog } from '@/lib/types';
 
+interface AuditLogWithModerator extends ModerationLog {
+  moderator: {
+    display_name: string | null;
+    role: string;
+  } | null;
+}
+
 export const metadata = {
   title: 'Audit Logs | Admin',
   description: 'View moderation action history',
 };
 
-async function getAuditLogs(limit: number = 50) {
+async function getAuditLogs(limit: number = 50): Promise<AuditLogWithModerator[]> {
   const supabase = createSupabaseServer();
   
   const { data, error } = await supabase
@@ -73,7 +80,7 @@ export default async function AuditLogsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {logs.map((log: ModerationLog) => (
+          {logs.map((log: AuditLogWithModerator) => (
             <Card key={log.id} className="p-4 border-white/10 bg-white/5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">

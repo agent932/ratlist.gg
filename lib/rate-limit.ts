@@ -5,6 +5,7 @@
 
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { NextResponse } from 'next/server';
 
 // In-memory cache for development when Upstash is not configured
 class MemoryCache {
@@ -63,9 +64,9 @@ function createRateLimiter(requests: number, window: string) {
   if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
     return new Ratelimit({
       redis: Redis.fromEnv(),
-      limiter: Ratelimit.slidingWindow(requests, window),
+      limiter: Ratelimit.slidingWindow(requests, window as `${number} ${'ms' | 's' | 'm' | 'h' | 'd'}`),
       analytics: true,
-      prefix: '@ratlist/ratelimit',
+      prefix: '@ratelist/ratelimit',
     });
   }
 
@@ -128,11 +129,11 @@ export async function rateLimit(request: Request, limiter: typeof publicRateLimi
  * Create a rate-limited Response
  */
 export function rateLimitedResponse() {
-  return new Response(
-    JSON.stringify({ 
+  return NextResponse.json(
+    { 
       error: 'Too Many Requests',
       message: 'You have exceeded the rate limit. Please try again later.' 
-    }),
+    },
     { 
       status: 429,
       headers: {

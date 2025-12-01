@@ -1,7 +1,7 @@
 // T013: MyFlagsSection component
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FlagCard } from './FlagCard';
@@ -37,11 +37,7 @@ export function MyFlagsSection() {
   const [hasMore, setHasMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
 
-  useEffect(() => {
-    fetchFlags();
-  }, [activeFilter, page]);
-
-  async function fetchFlags() {
+  const fetchFlags = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(
@@ -54,11 +50,15 @@ export function MyFlagsSection() {
         setTotalCount(data.total_count || 0);
       }
     } catch (error) {
-      console.error('Failed to fetch flags:', error);
+      console.error('Error fetching flags:', error);
     } finally {
       setLoading(false);
     }
-  }
+  }, [activeFilter, page]);
+
+  useEffect(() => {
+    fetchFlags();
+  }, [fetchFlags]);
 
   function handleFilterChange(filterId: string) {
     setActiveFilter(filterId);

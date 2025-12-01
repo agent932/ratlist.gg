@@ -140,7 +140,7 @@ export function LinkedPlayersSection() {
             </h3>
             <p className="text-white/60 mb-6">
               Link your in-game player IDs to claim ownership, track your reputation,
-              and receive notifications when you're reported.
+              and receive notifications when you&apos;re reported.
             </p>
             <Button
               onClick={() => setShowLinkForm(true)}

@@ -102,7 +102,7 @@ export function LinkedPlayerCard({
             <h3 className="text-xl font-semibold text-white mb-3">Unlink Player?</h3>
             <p className="text-white/60 mb-6">
               Are you sure you want to unlink <strong className="text-white">{formatPlayerName(playerId, true)}</strong> from{' '}
-              <strong className="text-white">{gameName}</strong>? You won't receive notifications for this
+              <strong className="text-white">{gameName}</strong>? You won&apos;t receive notifications for this
               player anymore.
             </p>
 
