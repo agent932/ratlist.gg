@@ -2,11 +2,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { getCurrentUserWithRole } from '@/lib/auth/guards';
+import { rateLimit, rateLimitedResponse, publicRateLimiter } from '@/lib/rate-limit';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { username: string } }
 ) {
+  // Apply rate limiting to prevent user enumeration
+  const allowed = await rateLimit(request, publicRateLimiter);
+  if (!allowed) {
+    return rateLimitedResponse();
+  }
+
   try {
     const { username } = params;
     const supabase = createSupabaseServer();

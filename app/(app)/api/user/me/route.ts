@@ -1,9 +1,16 @@
 // Get current user's profile
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guards';
 import { createSupabaseServer } from '@/lib/supabase/server';
+import { rateLimit, rateLimitedResponse, authenticatedRateLimiter } from '@/lib/rate-limit';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Apply rate limiting
+  const allowed = await rateLimit(request, authenticatedRateLimiter);
+  if (!allowed) {
+    return rateLimitedResponse();
+  }
+
   try {
     const user = await requireAuth();
     const supabase = createSupabaseServer();
