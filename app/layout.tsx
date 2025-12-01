@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { ReactNode } from 'react'
 import { Header } from '../components/layout/Header'
+import Script from 'next/script'
 
 export const metadata: Metadata = {
   title: 'Ratlist.gg',
@@ -12,6 +13,20 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="dark">
       <body>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-V9XRQYPDQE"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-V9XRQYPDQE');
+          `}
+        </Script>
+        
         <Header />
         <main className="min-h-[calc(100vh-4rem)]">{children}</main>
         <footer className="border-t border-white/10 bg-black/50 backdrop-blur-xl py-12">

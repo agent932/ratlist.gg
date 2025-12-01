@@ -3,7 +3,7 @@ import { BrowseFilters } from '@/components/features/browse-filters/BrowseFilter
 import { LeaderboardTable } from '@/components/features/leaderboard/LeaderboardTable';
 import { RecentIncidentsList } from '@/components/features/recent-incidents/RecentIncidentsList';
 
-export const revalidate = 180; // ISR cache for 3 minutes
+export const dynamic = 'force-dynamic';
 
 export default async function BrowsePage({
   searchParams,
