@@ -20,24 +20,24 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
   }
 
   return (
-    <Card className="p-6">
-      <table className="w-full">
+    <Card className="p-4 sm:p-6 overflow-x-auto">
+      <table className="w-full min-w-[500px]">
         <thead>
           <tr className="text-left border-b border-slate-700">
-            <th className="pb-2">Rank</th>
-            <th className="pb-2">Player</th>
-            <th className="pb-2 text-right">Reports</th>
-            <th className="pb-2 text-right">Score</th>
+            <th className="pb-2 text-sm sm:text-base">Rank</th>
+            <th className="pb-2 text-sm sm:text-base">Player</th>
+            <th className="pb-2 text-right text-sm sm:text-base">Reports</th>
+            <th className="pb-2 text-right text-sm sm:text-base">Score</th>
           </tr>
         </thead>
         <tbody>
           {entries.map((entry, idx) => (
             <tr key={entry.player_id} className="border-b border-slate-800">
-              <td className="py-3">{idx + 1}</td>
-              <td className="py-3 font-mono text-sm">{entry.display_name || entry.identifier}</td>
-              <td className="py-3 text-right">{entry.report_count}</td>
+              <td className="py-3 text-sm sm:text-base">{idx + 1}</td>
+              <td className="py-3 font-mono text-xs sm:text-sm truncate max-w-[150px] sm:max-w-none">{entry.display_name || entry.identifier}</td>
+              <td className="py-3 text-right text-sm sm:text-base">{entry.report_count}</td>
               <td
-                className={`py-3 text-right font-semibold ${
+                className={`py-3 text-right font-semibold text-sm sm:text-base ${
                   entry.score < 0 ? 'text-red-400' : 'text-green-400'
                 }`}
               >
