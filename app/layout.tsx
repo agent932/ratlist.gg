@@ -67,6 +67,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   <li><a href="/terms" className="hover:text-brand transition-colors">Terms of Service</a></li>
                   <li><a href="/privacy" className="hover:text-brand transition-colors">Privacy Policy</a></li>
                   <li><a href="/guidelines" className="hover:text-brand transition-colors">Community Guidelines</a></li>
+                  <li><a href="/contact" className="hover:text-brand transition-colors">Contact Us</a></li>
                 </ul>
               </div>
             </div>
