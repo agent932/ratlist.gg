@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { ReactNode } from 'react'
 import { Header } from '../components/layout/Header'
 import Script from 'next/script'
+import { Analytics } from '@vercel/analytics/next'
 
 export const metadata: Metadata = {
   title: 'Ratlist.gg',
@@ -77,6 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         </footer>
+        <Analytics />
       </body>
     </html>
   )
