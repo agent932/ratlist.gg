@@ -1,4 +1,5 @@
 // T003: Reusable FlagCard component for dashboard
+import { memo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
@@ -23,7 +24,7 @@ interface FlagCardProps {
   };
 }
 
-export function FlagCard({ flag }: FlagCardProps) {
+function FlagCardComponent({ flag }: FlagCardProps) {
   const resolutionColor = RESOLUTION_COLORS[flag.resolution as keyof typeof RESOLUTION_COLORS] || RESOLUTION_COLORS.open;
 
   return (
@@ -98,3 +99,5 @@ export function FlagCard({ flag }: FlagCardProps) {
     </Card>
   );
 }
+
+export const FlagCard = memo(FlagCardComponent);
