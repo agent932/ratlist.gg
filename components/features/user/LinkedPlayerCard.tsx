@@ -88,6 +88,7 @@ export function LinkedPlayerCard({
             <button
               onClick={() => setShowConfirmDialog(true)}
               className="px-4 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 text-sm font-medium transition-colors"
+              aria-label={`Unlink ${formatPlayerName(playerId, true)} from ${gameName}`}
             >
               Unlink
             </button>
@@ -97,10 +98,18 @@ export function LinkedPlayerCard({
 
       {/* Confirmation Dialog */}
       {showConfirmDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="unlink-dialog-title"
+          aria-describedby="unlink-dialog-desc"
+        >
           <Card className="max-w-md p-6 border-white/10 bg-black">
-            <h3 className="text-xl font-semibold text-white mb-3">Unlink Player?</h3>
-            <p className="text-white/60 mb-6">
+            <h3 id="unlink-dialog-title" className="text-xl font-semibold text-white mb-3">
+              Unlink Player?
+            </h3>
+            <p id="unlink-dialog-desc" className="text-white/60 mb-6">
               Are you sure you want to unlink <strong className="text-white">{formatPlayerName(playerId, true)}</strong> from{' '}
               <strong className="text-white">{gameName}</strong>? You won&apos;t receive notifications for this
               player anymore.
@@ -111,6 +120,7 @@ export function LinkedPlayerCard({
                 onClick={() => setShowConfirmDialog(false)}
                 disabled={isUnlinking}
                 className="px-4 py-2 rounded-lg border border-white/10 text-white/80 hover:bg-white/5 transition-colors disabled:opacity-50"
+                aria-label="Cancel unlinking player"
               >
                 Cancel
               </button>
@@ -118,6 +128,8 @@ export function LinkedPlayerCard({
                 onClick={handleUnlink}
                 disabled={isUnlinking}
                 className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors disabled:opacity-50"
+                aria-label="Confirm unlink player"
+                aria-busy={isUnlinking}
               >
                 {isUnlinking ? 'Unlinking...' : 'Unlink Player'}
               </button>

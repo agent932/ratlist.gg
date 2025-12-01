@@ -44,6 +44,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               variant="outline"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="w-full border-white/20 hover:bg-white/5"
+              aria-label={mobileMenuOpen ? "Close dashboard menu" : "Open dashboard menu"}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="h-4 w-4 mr-2" /> : <Menu className="h-4 w-4 mr-2" />}
               {mobileMenuOpen ? 'Close Menu' : 'Dashboard Menu'}
@@ -58,7 +60,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             `}
           >
             <div className="sticky top-24">
-              <nav className="space-y-1">
+              <nav className="space-y-1" aria-label="Dashboard navigation">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = item.tab === activeTab;
@@ -68,6 +70,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       key={item.id}
                       href={item.tab ? `/dashboard?tab=${item.tab}` : '/dashboard'}
                       onClick={() => setMobileMenuOpen(false)}
+                      aria-current={isActive ? 'page' : undefined}
                       className={`
                         flex items-center gap-3 px-4 py-3 rounded-lg transition-all
                         ${
@@ -87,7 +90,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 min-w-0">
+          <main className="flex-1 min-w-0" role="main" aria-label="Dashboard content">
             {children}
           </main>
         </div>

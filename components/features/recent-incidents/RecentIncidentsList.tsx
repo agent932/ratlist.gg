@@ -24,7 +24,7 @@ export function RecentIncidentsList({ incidents }: RecentIncidentsListProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" role="list" aria-label="Recent incidents">
       {incidents.map((incident) => {
         // Map game name to slug (handle cases where game_name might be undefined)
         const gameSlug = incident.game_name 
@@ -32,7 +32,8 @@ export function RecentIncidentsList({ incidents }: RecentIncidentsListProps) {
           : 'unknown';
         
         return (
-          <Card key={incident.id} className="p-4 sm:p-5 border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors">
+          <div key={incident.id} role="listitem" aria-label={`Incident report for ${formatPlayerName(incident.player_display_name || incident.player_identifier)} in ${incident.game_name}`}>
+            <Card className="p-4 sm:p-5 border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs text-white/40">{incident.game_name || 'Unknown Game'}</span>
@@ -57,7 +58,8 @@ export function RecentIncidentsList({ incidents }: RecentIncidentsListProps) {
               </span>
             </div>
             <p className="text-white/80 leading-relaxed">{incident.description}</p>
-          </Card>
+            </Card>
+          </div>
         );
       })}
     </div>

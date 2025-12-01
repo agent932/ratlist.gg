@@ -145,8 +145,10 @@ export function AccountSettingsSection() {
               onChange={(e) => setDisplayName(e.target.value)}
               className="mt-1.5 bg-white/5 border-white/20 text-white"
               placeholder="Your display name"
+              aria-describedby="display-name-help"
+              aria-required="false"
             />
-            <p className="text-sm text-white/60 mt-1">
+            <p id="display-name-help" className="text-sm text-white/60 mt-1">
               This is your public username visible to other users
             </p>
           </div>
@@ -188,7 +190,7 @@ export function AccountSettingsSection() {
             <Label htmlFor="email-notifications" className="text-white/80">
               Email Notifications
             </Label>
-            <p className="text-sm text-white/60 mt-1">
+            <p id="email-notifications-desc" className="text-sm text-white/60 mt-1">
               Receive email alerts when incidents are reported against your linked players
               (max 5 per day)
             </p>
@@ -197,6 +199,8 @@ export function AccountSettingsSection() {
             id="email-notifications"
             checked={emailNotifications}
             onCheckedChange={setEmailNotifications}
+            aria-describedby="email-notifications-desc"
+            aria-label="Toggle email notifications for incident reports"
           />
         </div>
       </Card>
@@ -207,6 +211,8 @@ export function AccountSettingsSection() {
           onClick={handleSaveSettings}
           disabled={saving}
           className="bg-brand hover:bg-brand/90 text-brand-foreground"
+          aria-label="Save account settings"
+          aria-busy={saving}
         >
           {saving ? 'Saving...' : 'Save Settings'}
         </Button>
@@ -214,21 +220,23 @@ export function AccountSettingsSection() {
 
       {/* Message Display */}
       {message && (
-        <Card
-          className={`p-4 border-white/10 ${
-            message.type === 'success'
-              ? 'bg-green-500/10 border-green-500/20'
-              : 'bg-red-500/10 border-red-500/20'
-          }`}
-        >
-          <p
-            className={`text-sm ${
-              message.type === 'success' ? 'text-green-400' : 'text-red-400'
+        <div role="alert" aria-live="polite">
+          <Card
+            className={`p-4 border-white/10 ${
+              message.type === 'success'
+                ? 'bg-green-500/10 border-green-500/20'
+                : 'bg-red-500/10 border-red-500/20'
             }`}
           >
-            {message.text}
-          </p>
-        </Card>
+            <p
+              className={`text-sm ${
+                message.type === 'success' ? 'text-green-400' : 'text-red-400'
+              }`}
+            >
+              {message.text}
+            </p>
+          </Card>
+        </div>
       )}
 
       {/* Data Export (GDPR) */}
@@ -245,6 +253,7 @@ export function AccountSettingsSection() {
               onClick={handleExportData}
               variant="outline"
               className="border-white/20 hover:bg-white/5"
+              aria-label="Export all your personal data in JSON format"
             >
               Export My Data
             </Button>
