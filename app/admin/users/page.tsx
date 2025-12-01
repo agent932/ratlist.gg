@@ -4,6 +4,13 @@ import { requireAdmin } from '@/lib/auth/guards';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
+import type { UserProfile } from '@/lib/types';
+
+interface UserSearchResult extends UserProfile {
+  email?: string;
+  incident_count: number;
+  flag_count: number;
+}
 
 export const metadata = {
   title: 'User Management | Admin',
@@ -89,7 +96,7 @@ export default async function UserManagementPage({
         </Card>
       ) : (
         <div className="space-y-3">
-          {users.map((user: any) => (
+          {users.map((user: UserSearchResult) => (
             <Card key={user.user_id} className="p-4 border-white/10 bg-white/5">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex-1">

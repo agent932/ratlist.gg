@@ -3,6 +3,21 @@ import { tierFromScore } from '../../../../../lib/reputation'
 import { Card } from '../../../../../components/ui/card'
 import { VerifiedBadge } from '../../../../../components/features/player/VerifiedBadge'
 
+interface PlayerProfileData {
+  score: number;
+  total_incidents: number;
+  active_incidents: number;
+  report_count: number;
+  last_incident_at: string | null;
+}
+
+interface SimpleIncident {
+  id: string;
+  category_id: number;
+  description: string;
+  created_at: string;
+}
+
 type Props = { params: { game: string; playerId: string } }
 
 export const revalidate = 180
@@ -45,8 +60,8 @@ export default async function PlayerPage({ params }: Props) {
     .rpc('fn_get_player_profile', { game_slug: params.game, identifier: playerRow.identifier })
     .maybeSingle()
 
-  const repAny = rep.data as any
-  const tier = repAny ? tierFromScore(repAny.score) : 'B'
+  const profileData = rep.data as PlayerProfileData | null
+  const tier = profileData ? tierFromScore(profileData.score) : 'B'
   const tierColors: Record<string, string> = {
     'S': 'text-green-400',
     'A': 'text-blue-400',
@@ -120,7 +135,7 @@ export default async function PlayerPage({ params }: Props) {
             
             {incidents && incidents.length > 0 ? (
               <div className="space-y-3">
-                {incidents.map((incident: any) => (
+                {incidents.map((incident: SimpleIncident) => (
                   <Card key={incident.id} className="p-4 border-white/10 bg-white/5 backdrop-blur-sm">
                     <div className="flex justify-between items-start mb-2">
                       <span className="text-xs text-white/50">
@@ -151,13 +166,13 @@ export default async function PlayerPage({ params }: Props) {
             <Card className="p-6 border-white/10 bg-white/5 backdrop-blur-sm space-y-4">
               <div>
                 <div className="text-sm text-white/60 mb-1">Total Reports</div>
-                <div className="text-3xl font-bold">{repAny?.report_count ?? 0}</div>
+                <div className="text-3xl font-bold">{profileData?.report_count ?? 0}</div>
               </div>
               
               <div className="border-t border-white/10 pt-4">
                 <div className="text-sm text-white/60 mb-1">Reputation Score</div>
-                <div className={`text-3xl font-bold ${(repAny?.score ?? 0) < 0 ? 'text-red-400' : 'text-green-400'}`}>
-                  {repAny?.score ?? 0}
+                <div className={`text-3xl font-bold ${(profileData?.score ?? 0) < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                  {profileData?.score ?? 0}
                 </div>
               </div>
               
@@ -169,8 +184,8 @@ export default async function PlayerPage({ params }: Props) {
               <div className="border-t border-white/10 pt-4">
                 <div className="text-sm text-white/60 mb-1">Last Incident</div>
                 <div className="text-sm">
-                  {repAny?.last_incident_at 
-                    ? new Date(repAny.last_incident_at).toLocaleDateString() 
+                  {profileData?.last_incident_at 
+                    ? new Date(profileData.last_incident_at).toLocaleDateString() 
                     : 'No incidents'}
                 </div>
               </div>

@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { createSupabaseBrowser } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 type UserRole = 'user' | 'moderator' | 'admin'
 
 export function Header() {
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [userRole, setUserRole] = useState<UserRole>('user')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const supabase = createSupabaseBrowser()

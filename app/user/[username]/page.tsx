@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card'
 import { UserProfileHeader } from '@/components/features/user/UserProfileHeader'
 import { LinkedPlayerCard } from '@/components/features/user/LinkedPlayerCard'
 import { LinkPlayerForm } from '@/components/features/user/LinkPlayerForm'
+import type { LinkedPlayer } from '@/lib/types'
 
 type PageProps = {
   params: { username: string }
@@ -119,14 +120,14 @@ export default async function UserProfilePage({ params }: PageProps) {
           </Card>
         ) : (
           <div className="space-y-3">
-            {profile.linked_players.map((player: any) => (
+            {profile.linked_players.map((player: LinkedPlayer) => (
               <LinkedPlayerCard
                 key={`${player.player_id}-${player.game_id}`}
                 playerId={player.player_id}
                 gameId={player.game_id}
                 gameName={player.game_name}
                 linkedAt={player.linked_at}
-                incidentCount={player.incident_count}
+                incidentCount={player.incident_count || 0}
                 canUnlink={isOwner}
                 onUnlink={() => window.location.reload()}
               />

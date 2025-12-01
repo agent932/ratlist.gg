@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth/guards';
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/card';
+import type { ModerationLog } from '@/lib/types';
 
 export const metadata = {
   title: 'Audit Logs | Admin',
@@ -72,7 +73,7 @@ export default async function AuditLogsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {logs.map((log: any) => (
+          {logs.map((log: ModerationLog) => (
             <Card key={log.id} className="p-4 border-white/10 bg-white/5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
