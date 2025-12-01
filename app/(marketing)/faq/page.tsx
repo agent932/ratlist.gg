@@ -110,7 +110,7 @@ export default function FAQPage() {
           <div className="inline-block rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm p-8 max-w-2xl">
             <h2 className="text-2xl font-bold mb-3">Still have questions?</h2>
             <p className="text-white/60 mb-6">
-              We're here to help. Reach out through our community channels or check our documentation.
+              We&apos;re here to help. Reach out through our community channels or check our documentation.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a 

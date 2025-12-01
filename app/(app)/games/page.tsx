@@ -99,9 +99,9 @@ export default async function GamesPage() {
         {/* Bottom info */}
         <div className="mt-16 text-center">
           <div className="inline-block rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm p-8 max-w-2xl">
-            <h3 className="text-xl font-semibold mb-3">Don't see your game?</h3>
+            <h3 className="text-xl font-semibold mb-3">Don&apos;t see your game?</h3>
             <p className="text-white/60 mb-4">
-              We're continuously expanding our support for extraction shooters and tactical games. 
+              We&apos;re continuously expanding our support for extraction shooters and tactical games. 
               Check back regularly for updates or reach out to suggest a new game.
             </p>
             <a 

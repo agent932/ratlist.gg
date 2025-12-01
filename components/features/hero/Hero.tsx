@@ -99,7 +99,7 @@ export function Hero() {
               </button>
             </form>
             <p className="mt-3 text-sm text-white/40">
-              Try searching: "Player123" or any in-game username
+              Try searching: &quot;Player123&quot; or any in-game username
             </p>
           </div>
 
