@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 
 interface UserProfile {
   display_name: string;
@@ -16,32 +17,19 @@ interface UserProfile {
 }
 
 export function AccountSettingsSection() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading: userLoading, refetch } = useCurrentUser();
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [displayName, setDisplayName] = useState('');
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  async function fetchProfile() {
-    try {
-      const response = await fetch('/api/user/me');
-      if (response.ok) {
-        const data = await response.json();
-        setProfile(data);
-        setDisplayName(data.display_name || '');
-        setEmailNotifications(data.email_notifications ?? true);
-      }
-    } catch (error) {
-      console.error('Failed to fetch profile:', error);
-    } finally {
-      setLoading(false);
+    if (user) {
+      setDisplayName(user.display_name || '');
+      setEmailNotifications((user as any).email_notifications ?? true);
     }
-  }
+  }, [user]);
 
   async function handleSaveSettings() {
     setSaving(true);
@@ -49,7 +37,7 @@ export function AccountSettingsSection() {
 
     try {
       // Update display name if changed
-      if (displayName !== profile?.display_name) {
+      if (displayName !== user?.display_name) {
         const nameResponse = await fetch('/api/user/update-profile', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -62,7 +50,7 @@ export function AccountSettingsSection() {
       }
 
       // Update email notifications if changed
-      if (emailNotifications !== profile?.email_notifications) {
+      if (emailNotifications !== (user as any)?.email_notifications) {
         const notifResponse = await fetch('/api/notifications/toggle', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -75,7 +63,7 @@ export function AccountSettingsSection() {
       }
 
       setMessage({ type: 'success', text: 'Settings saved successfully!' });
-      fetchProfile(); // Refresh profile data
+      refetch(); // Refresh profile data
     } catch (error) {
       console.error('Failed to save settings:', error);
       setMessage({ type: 'error', text: 'Failed to save settings. Please try again.' });
@@ -106,7 +94,7 @@ export function AccountSettingsSection() {
     }
   }
 
-  if (loading) {
+  if (userLoading || loading) {
     return (
       <Card className="p-6 border-white/10 bg-white/5 animate-pulse">
         <div className="space-y-4">
@@ -118,9 +106,9 @@ export function AccountSettingsSection() {
     );
   }
 
-  if (!profile) {
+  if (!user && !userLoading) {
     return (
-      <Card className="p-6 border-white/10 bg-white/5">
+      <Card className="p-8 text-center border-white/10 bg-white/5">
         <p className="text-white/60">Failed to load profile settings</p>
       </Card>
     );
@@ -161,9 +149,9 @@ export function AccountSettingsSection() {
             <Input
               id="email"
               type="email"
-              value={profile.email}
+              value={user?.email || ''}
               disabled
-              className="mt-1.5 bg-white/5 border-white/20 text-white/60"
+              className="bg-black/30 border-white/10 text-white/60"
             />
           </div>
 
@@ -171,7 +159,7 @@ export function AccountSettingsSection() {
           <div>
             <Label className="text-white/80">Member Since</Label>
             <p className="text-white mt-1.5">
-              {new Date(profile.created_at).toLocaleDateString('en-US', {
+              {user?.created_at && new Date(user.created_at).toLocaleDateString('en-US', {
                 month: 'long',
                 day: 'numeric',
                 year: 'numeric',
