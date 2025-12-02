@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
 
   const gameSlug = searchParams.get('game');
   const playerIdentifier = searchParams.get('player');
+  const status = searchParams.get('status') || 'active'; // Default to active incidents
   const limit = parseInt(searchParams.get('limit') || '50');
 
   if (!gameSlug || !playerIdentifier) {
@@ -75,6 +76,7 @@ export async function GET(request: NextRequest) {
         )
       `)
       .eq('reported_player_id', player.id)
+      .eq('status', status) // Filter by status (default: active)
       .order('created_at', { ascending: false })
       .limit(limit)
       .returns<IncidentQueryResult[]>();

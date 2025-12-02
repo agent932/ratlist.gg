@@ -10,6 +10,9 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/unit/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['tests/e2e/**/*', 'node_modules/**/*'],
+    typecheck: {
+      tsconfig: './tsconfig.test.json',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

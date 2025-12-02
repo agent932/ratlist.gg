@@ -64,25 +64,23 @@ export function ReportsAgainstMeSection() {
           let total = 0;
 
           for (const player of linkedPlayers) {
-            // Fetch incidents for this player
+            // Fetch incidents for this player (API now filters for active by default)
             const incidentsResponse = await fetch(
-              `/api/incidents?game=${player.game_slug}&player=${player.player_id}`
+              `/api/incidents?game=${player.game_slug}&player=${player.player_id}&status=active`
             );
             
             if (incidentsResponse.ok) {
               const incidentsData = await incidentsResponse.json();
-              const activeIncidents = (incidentsData.incidents || []).filter(
-                (inc: IncidentData) => inc.status === 'active'
-              );
+              const incidents = incidentsData.incidents || [];
 
-              if (activeIncidents.length > 0) {
+              if (incidents.length > 0) {
                 playersData.push({
                   player_id: player.player_id,
                   game_name: player.game_name,
                   game_slug: player.game_slug,
                   tier: player.tier || 'F',
-                  incident_count: activeIncidents.length,
-                  incidents: activeIncidents.map((inc: IncidentData) => ({
+                  incident_count: incidents.length,
+                  incidents: incidents.map((inc: IncidentData) => ({
                     id: inc.id,
                     player_id: player.player_id,
                     game_name: player.game_name,
@@ -94,7 +92,7 @@ export function ReportsAgainstMeSection() {
                     created_at: inc.created_at,
                   })),
                 });
-                total += activeIncidents.length;
+                total += incidents.length;
               }
             }
           }
@@ -158,19 +156,84 @@ export function ReportsAgainstMeSection() {
 
   return (
     <div className="space-y-6">
-      {/* Summary Card */}
+      {/* Enhanced Summary Card */}
       <Card className="p-6 border-white/10 bg-gradient-to-br from-orange-500/10 to-red-500/10">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-1">
-              Total Active Reports
-            </h3>
-            <p className="text-sm text-white/60">
-              Across {playersWithIncidents.length} linked player{playersWithIncidents.length !== 1 ? 's' : ''}
-            </p>
+        <div className="space-y-4">
+          {/* Header with Total Count */}
+          <div className="flex items-center justify-between pb-4 border-b border-white/10">
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-1">
+                Total Active Reports
+              </h3>
+              <p className="text-sm text-white/60">
+                Across {playersWithIncidents.length} linked player{playersWithIncidents.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+            <div className="text-4xl font-bold text-orange-400">
+              {totalIncidents}
+            </div>
           </div>
-          <div className="text-4xl font-bold text-orange-400">
-            {totalIncidents}
+
+          {/* Player Breakdown */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-white/80 mb-2">Breakdown by Player</h4>
+            {playersWithIncidents.map((playerData) => {
+              // Group incidents by severity
+              const severityCounts = playerData.incidents.reduce((acc, inc) => {
+                const sev = inc.severity || 'low';
+                acc[sev] = (acc[sev] || 0) + 1;
+                return acc;
+              }, {} as Record<string, number>);
+
+              return (
+                <div 
+                  key={`${playerData.game_slug}-${playerData.player_id}`}
+                  className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Badge variant="outline" className="border-brand/30 text-brand text-xs shrink-0">
+                      {playerData.game_name}
+                    </Badge>
+                    <Link
+                      href={`/player/${playerData.game_slug}/${playerData.player_id}`}
+                      className="text-sm font-medium text-white hover:text-brand transition-colors truncate"
+                    >
+                      {formatPlayerName(playerData.player_id, true)}
+                    </Link>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    {/* Severity badges */}
+                    <div className="flex items-center gap-1">
+                      {severityCounts.critical && (
+                        <Badge variant="outline" className="border-red-500/30 text-red-400 text-xs">
+                          {severityCounts.critical} Critical
+                        </Badge>
+                      )}
+                      {severityCounts.high && (
+                        <Badge variant="outline" className="border-orange-500/30 text-orange-400 text-xs">
+                          {severityCounts.high} High
+                        </Badge>
+                      )}
+                      {severityCounts.medium && (
+                        <Badge variant="outline" className="border-yellow-500/30 text-yellow-400 text-xs">
+                          {severityCounts.medium} Med
+                        </Badge>
+                      )}
+                      {severityCounts.low && (
+                        <Badge variant="outline" className="border-blue-500/30 text-blue-400 text-xs">
+                          {severityCounts.low} Low
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-orange-400">
+                        {playerData.incident_count}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </Card>
