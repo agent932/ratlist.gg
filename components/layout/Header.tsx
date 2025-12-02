@@ -10,34 +10,44 @@ export function Header() {
   const [user, setUser] = useState<User | null>(null)
   const [userRole, setUserRole] = useState<UserRole>('user')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const supabase = createSupabaseBrowser()
 
   useEffect(() => {
     async function loadUser() {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      
-      if (user) {
-        // Fetch user role from profile
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('role')
-          .eq('user_id', user.id)
-          .single()
+      try {
+        // Check both session and user for most reliable state
+        const { data: { session } } = await supabase.auth.getSession()
+        const currentUser = session?.user ?? null
         
-        if (profile?.role) {
-          setUserRole(profile.role as UserRole)
+        setUser(currentUser)
+        
+        if (currentUser) {
+          // Fetch user role from profile
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('role')
+            .eq('user_id', currentUser.id)
+            .single()
+          
+          if (profile?.role) {
+            setUserRole(profile.role as UserRole)
+          }
+        } else {
+          // Reset role when user signs out
+          setUserRole('user')
         }
-      } else {
-        // Reset role when user signs out
-        setUserRole('user')
+      } finally {
+        setIsLoading(false)
       }
     }
     
     loadUser()
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      console.log('Auth state changed:', event, session?.user?.email)
+      
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
         // Immediately update user state and fetch role
         const currentUser = session?.user ?? null
         setUser(currentUser)
@@ -53,12 +63,80 @@ export function Header() {
             setUserRole(profile.role as UserRole)
           }
         }
+        
+        // Close mobile menu when user signs in
+        setMobileMenuOpen(false)
       } else if (event === 'SIGNED_OUT') {
         setUser(null)
         setUserRole('user')
+        setMobileMenuOpen(false)
       }
     })
     return () => subscription.unsubscribe()
+  }, [])
+
+  // Refetch auth state when page becomes visible (handles mobile browser tab switching)
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (!document.hidden) {
+        const { data: { session } } = await supabase.auth.getSession()
+        const currentUser = session?.user ?? null
+        
+        if (currentUser !== user) {
+          console.log('Visibility change detected user state change')
+          setUser(currentUser)
+          
+          if (currentUser) {
+            const { data: profile } = await supabase
+              .from('user_profiles')
+              .select('role')
+              .eq('user_id', currentUser.id)
+              .single()
+            
+            if (profile?.role) {
+              setUserRole(profile.role as UserRole)
+            }
+          } else {
+            setUserRole('user')
+          }
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [supabase, user])
+
+  // Listen for storage events (cross-tab auth changes)
+  useEffect(() => {
+    const handleStorageChange = async (e: StorageEvent) => {
+      if (e.key?.includes('supabase.auth.token')) {
+        console.log('Storage event detected - auth token changed')
+        const { data: { session } } = await supabase.auth.getSession()
+        const currentUser = session?.user ?? null
+        
+        setUser(currentUser)
+        
+        if (currentUser) {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('role')
+            .eq('user_id', currentUser.id)
+            .single()
+          
+          if (profile?.role) {
+            setUserRole(profile.role as UserRole)
+          }
+        } else {
+          setUserRole('user')
+        }
+        
+        setMobileMenuOpen(false)
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
   }, [supabase])
 
   async function signOut() {
