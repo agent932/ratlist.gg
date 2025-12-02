@@ -16,6 +16,14 @@ $routes = @(
     "/contact"
 )
 
+# Note: Dynamic routes need actual data to test
+# These would need to be tested manually or with E2E tests:
+# - /user/{username} (e.g., /user/testuser)
+# - /player/{game}/{playerId} (e.g., /player/the-finals/Player#1234)
+# - /dashboard (requires authentication)
+# - /moderator/flags (requires moderator role)
+# - /admin/dashboard, /admin/users, /admin/audit (requires admin role)
+
 Write-Host ""
 Write-Host "Checking Ratlist.gg Routes..." -ForegroundColor Cyan
 Write-Host "Base URL: $baseUrl" -ForegroundColor Gray

@@ -77,6 +77,7 @@ as $$
     join public.players p on p.id = i.reported_player_id
     where p.identifier = pl.player_id
     and i.game_id = pl.game_id
+    and i.status = 'active'  -- Only count active incidents
   ) incident_counts on true
   where pl.user_id = target_user_id
   order by pl.linked_at desc;

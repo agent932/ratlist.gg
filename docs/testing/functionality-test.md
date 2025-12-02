@@ -19,6 +19,10 @@ This document tracks testing of all links, navigation, and core functionality.
 - [ ] **Sign In** (`/auth/sign-in`) - Unauthenticated users
 - [ ] **Sign Out** - Authenticated users
 
+### Dynamic Routes
+- [ ] **User Profile** (`/user/{username}`) - Any valid username
+- [ ] **Player Profile** (`/player/{game}/{playerId}`) - Any valid game and player ID
+
 ### Moderator Links (Moderator role)
 - [ ] **Flags** (`/moderator/flags`)
 
@@ -63,6 +67,16 @@ This document tracks testing of all links, navigation, and core functionality.
 ### FAQ Page (`/faq`)
 - [ ] Page loads
 - [ ] Content displays correctly
+
+### User Profile (`/user/{username}`)
+- [ ] Page loads with valid username
+- [ ] User display name shows
+- [ ] Linked players section displays
+- [ ] Link player form works (if own profile)
+- [ ] Unlink player works (if own profile)
+- [ ] Badge shows on profile
+- [ ] Empty state shows when no linked players
+- [ ] Permission check (own profile vs others)
 
 ### Player Profile (`/player/{game}/{playerId}`)
 - [ ] Page loads with valid player ID
@@ -209,11 +223,13 @@ This document tracks testing of all links, navigation, and core functionality.
 
 ### User Endpoints
 - [ ] `GET /api/user/me` - Get current user
-- [ ] `GET /api/user/{username}` - Get user profile
-- [ ] `POST /api/user/link-player` - Link player
-- [ ] `POST /api/user/unlink-player` - Unlink player
-- [ ] `POST /api/user/update-profile` - Update profile
-- [ ] `GET /api/user/export` - Export user data
+- [ ] `GET /api/user/{username}` - Get user profile (public + private if owner)
+- [ ] `GET /api/user/incidents` - Get user's incident reports
+- [ ] `GET /api/user/flags` - Get user's flags
+- [ ] `POST /api/user/link-player` - Link player ID to account
+- [ ] `POST /api/user/unlink-player` - Unlink player ID from account
+- [ ] `POST /api/user/update-profile` - Update user profile
+- [ ] `GET /api/user/export` - Export user data (GDPR)
 
 ### Incident Endpoints
 - [ ] `POST /api/incidents` - Create incident

@@ -62,24 +62,28 @@ export function DashboardOverview() {
       value: stats.linked_players_count,
       color: 'text-brand',
       bgColor: 'bg-brand/10',
+      href: '/dashboard?tab=linked-players',
     },
     {
       label: 'Reports Submitted',
       value: stats.incidents_submitted_count,
       color: 'text-blue-400',
       bgColor: 'bg-blue-400/10',
+      href: '/dashboard?tab=my-reports',
     },
     {
       label: 'Flags Submitted',
       value: stats.flags_submitted_count,
       color: 'text-purple-400',
       bgColor: 'bg-purple-400/10',
+      href: '/dashboard?tab=my-flags',
     },
     {
       label: 'Reports Against Me',
       value: stats.reports_against_me_count,
       color: 'text-orange-400',
       bgColor: 'bg-orange-400/10',
+      href: '/dashboard?tab=reports-against-me',
     },
   ];
 
@@ -88,17 +92,18 @@ export function DashboardOverview() {
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat) => (
-          <Card
-            key={stat.label}
-            className={`p-6 border-white/10 ${stat.bgColor} transition-all hover:scale-105`}
-          >
-            <div className="text-sm font-medium text-white/60 mb-2">
-              {stat.label}
-            </div>
-            <div className={`text-3xl font-bold ${stat.color}`}>
-              {stat.value}
-            </div>
-          </Card>
+          <Link key={stat.label} href={stat.href}>
+            <Card
+              className={`p-6 border-white/10 ${stat.bgColor} transition-all hover:scale-105 cursor-pointer`}
+            >
+              <div className="text-sm font-medium text-white/60 mb-2">
+                {stat.label}
+              </div>
+              <div className={`text-3xl font-bold ${stat.color}`}>
+                {stat.value}
+              </div>
+            </Card>
+          </Link>
         ))}
       </div>
 

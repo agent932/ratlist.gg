@@ -54,3 +54,17 @@ next-env.d.ts
 /playwright-report/
 /test-results/
 /playwright/.cache/
+
+# Playwright MCP
+.playwright-mcp/
+
+# Spec-kit artifacts
+.specify/
+
+# Development scripts output
+scripts/*.log
+scripts/*.txt
+
+# Documentation drafts
+*.draft.md
+*.wip.md
