@@ -140,8 +140,21 @@ export function Header() {
   }, [supabase])
 
   async function signOut() {
-    await supabase.auth.signOut()
-    window.location.href = '/'
+    try {
+      console.log('Signing out...')
+      setMobileMenuOpen(false) // Close mobile menu first
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.error('Sign out error:', error)
+        throw error
+      }
+      console.log('Sign out successful, redirecting...')
+      window.location.href = '/'
+    } catch (error) {
+      console.error('Failed to sign out:', error)
+      // Still redirect even if there's an error
+      window.location.href = '/'
+    }
   }
 
   return (
@@ -235,7 +248,12 @@ export function Header() {
                 Report
               </a>
               <button
-                onClick={signOut}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  signOut()
+                }}
+                type="button"
                 className="px-4 py-2 rounded-lg text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 transition-colors"
                 aria-label="Sign out of your account"
               >
@@ -355,8 +373,14 @@ export function Header() {
                   Report Incident
                 </a>
                 <button
-                  onClick={signOut}
-                  className="px-4 py-2 rounded-lg text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 transition-colors text-left"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    signOut()
+                  }}
+                  type="button"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 transition-colors text-left w-full"
+                  aria-label="Sign out of your account"
                 >
                   Sign Out
                 </button>
