@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LinkedPlayerCard } from '@/components/features/user/LinkedPlayerCard';
 import { LinkPlayerForm } from '@/components/features/user/LinkPlayerForm';
+import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 
 interface LinkedPlayer {
   id: string;
@@ -19,25 +20,22 @@ interface LinkedPlayer {
 }
 
 export function LinkedPlayersSection() {
+  const { user, loading: userLoading } = useCurrentUser();
   const [linkedPlayers, setLinkedPlayers] = useState<LinkedPlayer[]>([]);
   const [loading, setLoading] = useState(true);
   const [showLinkForm, setShowLinkForm] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
+  const username = user?.display_name || user?.email || null;
 
   useEffect(() => {
     async function fetchLinkedPlayers() {
-      try {
-        // Get current user's username first
-        const userResponse = await fetch('/api/user/me');
-        if (!userResponse.ok) {
-          setLoading(false);
-          return;
-        }
-        const userData = await userResponse.json();
-        setUsername(userData.display_name || userData.email);
+      if (!username) {
+        setLoading(false);
+        return;
+      }
 
+      try {
         // Fetch linked players
-        const response = await fetch(`/api/user/${userData.display_name || userData.email}`);
+        const response = await fetch(`/api/user/${username}`);
         if (response.ok) {
           const data = await response.json();
           setLinkedPlayers(data.linked_players || []);
@@ -49,8 +47,10 @@ export function LinkedPlayersSection() {
       }
     }
 
-    fetchLinkedPlayers();
-  }, []);
+    if (!userLoading) {
+      fetchLinkedPlayers();
+    }
+  }, [username, userLoading]);
 
   const handlePlayerLinked = () => {
     setShowLinkForm(false);
@@ -63,7 +63,7 @@ export function LinkedPlayersSection() {
     window.location.reload();
   };
 
-  if (loading) {
+  if (loading || userLoading) {
     return (
       <div className="space-y-4">
         {[...Array(2)].map((_, i) => (

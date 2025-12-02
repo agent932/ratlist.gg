@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { validateEmbarkID, EMBARK_ID_GAMES } from '@/lib/utils/validate-embark-id'
 
 type Game = { id: string; slug: string; name: string }
 type Category = { id: number; slug: string; label: string }
@@ -10,15 +11,6 @@ type Category = { id: number; slug: string; label: string }
 type Props = {
   games: Game[]
   categories: Category[]
-}
-
-// Games that use EmbarkID format (with # symbols)
-const EMBARK_ID_GAMES = ['the-finals', 'arc-raiders'];
-
-// Validate EmbarkID format: PlayerName#1234 (at least one char before #, at least one digit after)
-function validateEmbarkID(value: string): boolean {
-  const embarkIdPattern = /^.+#\d+$/;
-  return embarkIdPattern.test(value);
 }
 
 export function IncidentForm({ games, categories }: Props) {

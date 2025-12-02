@@ -5,6 +5,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { IncidentCard } from './IncidentCard';
+import { EmptyState } from '@/components/ui/empty-state';
+import { FileText } from 'lucide-react';
 
 interface Incident {
   id: string;

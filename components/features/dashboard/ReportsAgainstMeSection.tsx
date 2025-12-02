@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { IncidentCard } from './IncidentCard';
 import Link from 'next/link';
 import { formatPlayerName } from '@/lib/utils/player';
+import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 
 interface IncidentData {
   id: string;
@@ -37,24 +38,23 @@ interface LinkedPlayerWithIncidents {
 }
 
 export function ReportsAgainstMeSection() {
+  const { user, loading: userLoading } = useCurrentUser();
   const [playersWithIncidents, setPlayersWithIncidents] = useState<LinkedPlayerWithIncidents[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalIncidents, setTotalIncidents] = useState(0);
+  const username = user?.display_name || user?.email || null;
 
   useEffect(() => {
     async function fetchData() {
+      if (!username) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
-        // Get current user's username
-        const userResponse = await fetch('/api/user/me');
-        if (!userResponse.ok) {
-          setLoading(false);
-          return;
-        }
-        const userData = await userResponse.json();
-
         // Fetch user profile with linked players and their incidents
-        const response = await fetch(`/api/user/${userData.display_name || userData.email}`);
+        const response = await fetch(`/api/user/${username}`);
         if (response.ok) {
           const data = await response.json();
           const linkedPlayers = data.linked_players || [];
@@ -109,8 +109,10 @@ export function ReportsAgainstMeSection() {
       }
     }
 
-    fetchData();
-  }, []);
+    if (!userLoading) {
+      fetchData();
+    }
+  }, [username, userLoading]);
 
   if (loading) {
     return (

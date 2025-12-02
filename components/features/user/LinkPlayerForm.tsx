@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
+import { validateEmbarkID, EMBARK_ID_GAMES } from '@/lib/utils/validate-embark-id'
 
 type Game = {
   id: string
@@ -11,15 +12,6 @@ type Game = {
 
 type LinkPlayerFormProps = {
   onSuccess?: () => void
-}
-
-// Games that use EmbarkID format
-const EMBARK_ID_GAMES = ['the-finals', 'arc-raiders'];
-
-// Validate EmbarkID format: PlayerName#1234 (at least one char before #, at least one digit after)
-function validateEmbarkID(value: string): boolean {
-  const embarkIdPattern = /^.+#\d+$/;
-  return embarkIdPattern.test(value);
 }
 
 export function LinkPlayerForm({ onSuccess }: LinkPlayerFormProps) {
