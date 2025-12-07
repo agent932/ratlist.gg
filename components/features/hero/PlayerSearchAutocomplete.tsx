@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input'
 interface PlayerSuggestion {
   identifier: string
   display_name: string | null
+  game_slug: string
+  game_name: string
   incident_count: number
 }
 
@@ -59,15 +61,17 @@ export function PlayerSearchAutocomplete() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (query.trim()) {
-      window.location.href = `/player/tarkov/${encodeURIComponent(query.trim())}`
+      // If we have suggestions, use the first one's game, otherwise default to tarkov
+      const gameSlug = suggestions.length > 0 ? suggestions[0].game_slug : 'tarkov'
+      window.location.href = `/player/${gameSlug}/${encodeURIComponent(query.trim())}`
     }
   }
 
-  const handleSuggestionClick = (identifier: string) => {
-    setQuery(identifier)
+  const handleSuggestionClick = (suggestion: PlayerSuggestion) => {
+    setQuery(suggestion.identifier)
     setIsOpen(false)
-    // Identifier is already redacted from API, use it directly
-    window.location.href = `/player/tarkov/${encodeURIComponent(identifier)}`
+    // Use the game_slug from the suggestion
+    window.location.href = `/player/${suggestion.game_slug}/${encodeURIComponent(suggestion.identifier)}`
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -87,7 +91,7 @@ export function PlayerSearchAutocomplete() {
       case 'Enter':
         e.preventDefault()
         if (selectedIndex >= 0 && suggestions[selectedIndex]) {
-          handleSuggestionClick(suggestions[selectedIndex].identifier)
+          handleSuggestionClick(suggestions[selectedIndex])
         } else {
           handleSubmit(e)
         }
@@ -124,17 +128,22 @@ export function PlayerSearchAutocomplete() {
           <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl max-h-80 overflow-y-auto z-50">
             {suggestions.map((suggestion, index) => (
               <button
-                key={suggestion.identifier}
+                key={`${suggestion.game_slug}-${suggestion.identifier}`}
                 type="button"
-                onClick={() => handleSuggestionClick(suggestion.identifier)}
+                onClick={() => handleSuggestionClick(suggestion)}
                 className={`w-full px-4 py-3 text-left hover:bg-white/10 transition-colors border-b border-white/5 last:border-b-0 ${
                   index === selectedIndex ? 'bg-white/10' : ''
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-white truncate">
-                      {suggestion.display_name || suggestion.identifier}
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-white truncate">
+                        {suggestion.display_name || suggestion.identifier}
+                      </span>
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-brand/20 text-brand/80 shrink-0">
+                        {suggestion.game_name}
+                      </span>
                     </div>
                     {suggestion.display_name && (
                       <div className="text-sm text-white/50 truncate">

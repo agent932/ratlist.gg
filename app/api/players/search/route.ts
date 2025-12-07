@@ -15,12 +15,14 @@ export async function GET(request: NextRequest) {
 
     const supabase = createSupabaseServer()
 
-    // Search for players matching the query
+    // Search for players matching the query with game information
     const { data, error } = await supabase
       .from('players')
       .select(`
         identifier,
         display_name,
+        game_id,
+        games!inner(slug, name),
         incidents:incidents(count)
       `)
       .or(`identifier.ilike.%${query}%,display_name.ilike.%${query}%`)
@@ -36,6 +38,8 @@ export async function GET(request: NextRequest) {
     const suggestions = data.map((player: any) => ({
       identifier: formatPlayerName(player.identifier), // Redact discriminator for privacy
       display_name: player.display_name ? formatPlayerName(player.display_name) : null,
+      game_slug: player.games.slug,
+      game_name: player.games.name,
       incident_count: player.incidents?.[0]?.count || 0
     }))
 
