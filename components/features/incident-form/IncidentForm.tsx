@@ -25,7 +25,8 @@ export function IncidentForm({ games, categories }: Props) {
     setError('')
     setSuccess(false)
 
-    const formData = new FormData(e.currentTarget)
+    const form = e.currentTarget
+    const formData = new FormData(form)
     const occurredAt = formData.get('occurred_at') as string
     const identifier = formData.get('identifier') as string
     
@@ -61,10 +62,11 @@ export function IncidentForm({ games, categories }: Props) {
       } else {
         const data = await res.json()
         setSuccess(true)
-        e.currentTarget.reset()
-        // Redirect to player page after short delay using game slug
+        // Reset form immediately
+        form.reset()
+        // Redirect to browse page for the selected game after short delay
         setTimeout(() => {
-          window.location.href = `/player/${selectedGameSlug}/${formData.get('identifier')}`
+          window.location.href = `/browse?game=${selectedGameSlug}`
         }, 2000)
       }
     } catch (err) {
@@ -92,7 +94,7 @@ export function IncidentForm({ games, categories }: Props) {
           role="status"
           aria-live="polite"
         >
-          Incident submitted successfully! Redirecting to player profile...
+          Incident submitted successfully! Redirecting to browse page...
         </div>
       )}
 

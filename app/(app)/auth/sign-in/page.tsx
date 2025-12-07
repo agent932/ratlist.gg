@@ -4,23 +4,102 @@ import { createSupabaseBrowser } from '../../../../lib/supabase/client'
 import { useState } from 'react'
 import { Button } from '../../../../components/ui/button'
 import { Input } from '../../../../components/ui/input'
+import { useRouter } from 'next/navigation'
 
 export default function SignInPage() {
   const supabase = createSupabaseBrowser()
+  const router = useRouter()
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  const [authMethod, setAuthMethod] = useState<'password' | 'magic-link'>('password')
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
 
-  async function signInWithEmail(e: React.FormEvent) {
+  async function handlePasswordAuth(e: React.FormEvent) {
     e.preventDefault()
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (!error) setSent(true)
-    // TODO: show toast on error
+    setLoading(true)
+    setError(null)
+
+    try {
+      console.log('🔐 Attempting authentication...')
+      console.log('Mode:', mode)
+      console.log('Email:', email)
+      console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+      
+      if (mode === 'signup') {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
+        })
+        
+        if (error) {
+          console.error('❌ Sign up error:', error)
+          throw error
+        }
+        
+        if (data?.user?.identities?.length === 0) {
+          setError('An account with this email already exists')
+        } else {
+          console.log('✅ Sign up successful')
+          setSent(true)
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+        
+        if (error) {
+          console.error('❌ Sign in error:', error)
+          throw error
+        }
+        
+        console.log('✅ Sign in successful, redirecting...')
+        router.push('/dashboard')
+        router.refresh()
+      }
+    } catch (err: any) {
+      console.error('💥 Auth error:', err)
+      const errorMessage = err.message || 'Authentication failed'
+      setError(errorMessage)
+      
+      // Additional diagnostic info
+      if (err.message?.includes('fetch')) {
+        setError('Network error: Cannot connect to authentication server. Check if Supabase is running.')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
+
+  async function handleMagicLink(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      
+      if (error) throw error
+      setSent(true)
+    } catch (err: any) {
+      setError(err.message || 'Failed to send magic link')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const isPasswordValid = password.length >= 6
 
   return (
     <section className="relative overflow-hidden min-h-[calc(100vh-14rem)]">
@@ -49,41 +128,181 @@ export default function SignInPage() {
           
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">
             <span className="bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
-              Sign In to Ratlist
+              {mode === 'signin' ? 'Sign In to Ratlist' : 'Create Your Account'}
             </span>
           </h1>
           
           <p className="text-white/60">
-            Sign in to report incidents and access your account
+            {mode === 'signin' 
+              ? 'Sign in to report incidents and access your account'
+              : 'Join Ratlist to start reporting and tracking incidents'
+            }
           </p>
         </div>
 
-        {/* Sign-in card */}
+        {/* Sign-in/Sign-up card */}
         <div className="rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm p-8">
           <div className="space-y-6">
-            {/* Email magic link */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-white/80">
-                Email Magic Link
-              </label>
-              <form onSubmit={signInWithEmail} className="flex items-center gap-2">
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white/5 border-white/10"
-                />
-                <Button type="submit" className="bg-brand hover:bg-brand/90">
-                  {sent ? 'Link sent ✓' : 'Send link'}
+            {/* Mode toggle */}
+            <div className="flex gap-2 p-1 bg-white/5 rounded-lg">
+              <button
+                onClick={() => {
+                  setMode('signin')
+                  setError(null)
+                  setSent(false)
+                }}
+                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  mode === 'signin' 
+                    ? 'bg-brand text-white' 
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => {
+                  setMode('signup')
+                  setError(null)
+                  setSent(false)
+                }}
+                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  mode === 'signup' 
+                    ? 'bg-brand text-white' 
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            {/* Auth method toggle */}
+            <div className="flex gap-2 text-xs">
+              <button
+                onClick={() => {
+                  setAuthMethod('password')
+                  setError(null)
+                  setSent(false)
+                }}
+                className={`px-3 py-1.5 rounded transition-colors ${
+                  authMethod === 'password'
+                    ? 'bg-white/10 text-white'
+                    : 'text-white/50 hover:text-white/70'
+                }`}
+              >
+                Password
+              </button>
+              <button
+                onClick={() => {
+                  setAuthMethod('magic-link')
+                  setError(null)
+                  setSent(false)
+                }}
+                className={`px-3 py-1.5 rounded transition-colors ${
+                  authMethod === 'magic-link'
+                    ? 'bg-white/10 text-white'
+                    : 'text-white/50 hover:text-white/70'
+                }`}
+              >
+                Magic Link
+              </button>
+            </div>
+
+            {/* Error message */}
+            {error && (
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
+
+            {/* Success message for sign up */}
+            {sent && mode === 'signup' && (
+              <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                <p className="text-sm text-green-400">
+                  Check your email to confirm your account!
+                </p>
+              </div>
+            )}
+
+            {/* Password form */}
+            {authMethod === 'password' && !sent && (
+              <form onSubmit={handlePasswordAuth} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-white/80">
+                    Email
+                  </label>
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="bg-white/5 border-white/10"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-white/80">
+                    Password
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder={mode === 'signup' ? 'At least 6 characters' : '••••••••'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="bg-white/5 border-white/10"
+                    disabled={loading}
+                  />
+                  {mode === 'signup' && password && (
+                    <p className={`mt-1.5 text-xs ${isPasswordValid ? 'text-green-400' : 'text-white/50'}`}>
+                      {isPasswordValid ? '✓ Password meets requirements' : 'Must be at least 6 characters'}
+                    </p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-brand hover:bg-brand/90"
+                  disabled={loading || (mode === 'signup' && !isPasswordValid)}
+                >
+                  {loading ? 'Loading...' : mode === 'signin' ? 'Sign In' : 'Create Account'}
                 </Button>
               </form>
-              {sent && (
-                <p className="mt-2 text-sm text-green-400">
-                  Check your email for the sign-in link!
-                </p>
-              )}
-            </div>
+            )}
+
+            {/* Magic link form */}
+            {authMethod === 'magic-link' && (
+              <div>
+                <label className="block text-sm font-medium mb-2 text-white/80">
+                  Email
+                </label>
+                <form onSubmit={handleMagicLink} className="flex items-center gap-2">
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="bg-white/5 border-white/10"
+                    disabled={loading}
+                  />
+                  <Button 
+                    type="submit" 
+                    className="bg-brand hover:bg-brand/90"
+                    disabled={loading}
+                  >
+                    {loading ? 'Sending...' : sent ? 'Sent ✓' : 'Send link'}
+                  </Button>
+                </form>
+                {sent && (
+                  <p className="mt-2 text-sm text-green-400">
+                    Check your email for the sign-in link!
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Divider */}
             <div className="relative">

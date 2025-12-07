@@ -171,26 +171,33 @@ alter table public.user_profiles enable row level security;
 -- Public reads for games and categories (no RLS there)
 
 -- players: public select
-create policy if not exists players_select_public on public.players for select using (true);
+drop policy if exists players_select_public on public.players;
+create policy players_select_public on public.players for select using (true);
 
 -- incidents: public select (hide reporter via column selection in app)
-create policy if not exists incidents_select_public on public.incidents for select using (true);
+drop policy if exists incidents_select_public on public.incidents;
+create policy incidents_select_public on public.incidents for select using (true);
 
 -- incidents: insert by authenticated user only
-create policy if not exists incidents_insert_owner on public.incidents for insert with check (auth.uid() = reporter_user_id);
+drop policy if exists incidents_insert_owner on public.incidents;
+create policy incidents_insert_owner on public.incidents for insert with check (auth.uid() = reporter_user_id);
 
 -- incidents: update/delete by owner within 15 minutes
-create policy if not exists incidents_owner_modify on public.incidents for update using (
+drop policy if exists incidents_owner_modify on public.incidents;
+create policy incidents_owner_modify on public.incidents for update using (
   auth.uid() = reporter_user_id and created_at > now() - interval '15 minutes'
 );
-create policy if not exists incidents_owner_delete on public.incidents for delete using (
+drop policy if exists incidents_owner_delete on public.incidents;
+create policy incidents_owner_delete on public.incidents for delete using (
   auth.uid() = reporter_user_id and created_at > now() - interval '15 minutes'
 );
 
 -- flags: select by author or moderator; insert by authenticated
-create policy if not exists flags_select_owner on public.flags for select using (
+drop policy if exists flags_select_owner on public.flags;
+create policy flags_select_owner on public.flags for select using (
   auth.uid() = flagger_user_id or exists (
     select 1 from public.user_profiles up where up.user_id = auth.uid() and up.role = 'moderator'
   )
 );
-create policy if not exists flags_insert_owner on public.flags for insert with check (auth.uid() = flagger_user_id);
+drop policy if exists flags_insert_owner on public.flags;
+create policy flags_insert_owner on public.flags for insert with check (auth.uid() = flagger_user_id);

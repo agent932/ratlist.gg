@@ -1,4 +1,5 @@
 -- Update fn_get_recent_incidents to include game name and category label
+drop function if exists public.fn_get_recent_incidents(text, int);
 create or replace function public.fn_get_recent_incidents(game_slug text, lim int)
 returns table (
   id uuid,

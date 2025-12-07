@@ -13,6 +13,7 @@ add column if not exists moderation_reason text;
 create index if not exists idx_incidents_status on public.incidents(status);
 
 -- M012: Update fn_get_player_profile to exclude removed incidents
+drop function if exists public.fn_get_player_profile(text, text);
 create or replace function public.fn_get_player_profile(game_slug text, identifier text)
 returns table (
   player_id uuid,
@@ -141,6 +142,7 @@ end;
 $$;
 
 -- M012: Update fn_get_recent_incidents to exclude removed incidents
+drop function if exists public.fn_get_recent_incidents(text, int);
 create or replace function public.fn_get_recent_incidents(game_slug text, lim int)
 returns table (
   id uuid,

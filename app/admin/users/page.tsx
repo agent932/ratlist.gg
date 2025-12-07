@@ -148,12 +148,18 @@ export default async function UserManagementPage({
                 </div>
 
                 <div className="flex gap-2">
-                  <Link
-                    href={`/user/${user.display_name}`}
-                    className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-sm transition-colors"
-                  >
-                    View Profile
-                  </Link>
+                  {user.display_name ? (
+                    <Link
+                      href={`/user/${encodeURIComponent(user.display_name)}`}
+                      className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg text-sm transition-colors"
+                    >
+                      View Profile
+                    </Link>
+                  ) : (
+                    <span className="px-4 py-2 bg-white/5 border border-white/10 text-white/40 rounded-lg text-sm cursor-not-allowed">
+                      No Display Name
+                    </span>
+                  )}
                   {/* Future: Add suspend/role management buttons */}
                 </div>
               </div>

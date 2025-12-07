@@ -2,6 +2,7 @@ import { createSupabaseServer } from '../../../../../lib/supabase/server'
 import { tierFromScore } from '../../../../../lib/reputation'
 import { Card } from '../../../../../components/ui/card'
 import { VerifiedBadge } from '../../../../../components/features/player/VerifiedBadge'
+import { formatPlayerName } from '../../../../../lib/utils/player'
 
 interface PlayerProfileData {
   score: number;
@@ -34,12 +35,25 @@ export default async function PlayerPage({ params }: Props) {
     </div>
   )
 
-  const { data: playerRow } = await supabase
+  // Handle both full identifiers (with #) and redacted ones (without #)
+  // If no # in the playerId, search for any identifier starting with that name
+  const decodedPlayerId = decodeURIComponent(params.playerId)
+  const hasDiscriminator = decodedPlayerId.includes('#')
+  
+  let playerQuery = supabase
     .from('players')
     .select('id, identifier, display_name, game_id')
-    .eq('identifier', params.playerId)
     .eq('game_id', gameRow.id)
-    .single()
+  
+  if (hasDiscriminator) {
+    // Exact match for full identifier
+    playerQuery = playerQuery.eq('identifier', decodedPlayerId)
+  } else {
+    // Match any identifier starting with the redacted name (e.g., "PlayerName" matches "PlayerName#1234")
+    playerQuery = playerQuery.like('identifier', `${decodedPlayerId}#%`)
+  }
+  
+  const { data: playerRow } = await playerQuery.single()
 
   if (!playerRow) return (
     <div className="container py-24 text-center">
@@ -50,11 +64,16 @@ export default async function PlayerPage({ params }: Props) {
     </div>
   )
 
-  // Check if player is linked to a user account
+  // Check if player is linked to a user account and get current user
+  const { data: { user } } = await supabase.auth.getUser()
+  
   const { data: ownership } = await supabase.rpc('fn_get_player_ownership', {
     target_player_id: playerRow.identifier,
     target_game_id: gameRow.id,
   }).maybeSingle()
+  
+  // Check if current user is the owner
+  const isOwner: boolean = !!(user && ownership && (ownership as any).user_id === user.id)
 
   const rep = await supabase
     .rpc('fn_get_player_profile', { game_slug: params.game, identifier: playerRow.identifier })
@@ -102,7 +121,7 @@ export default async function PlayerPage({ params }: Props) {
           
           <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
             <h1 className="text-4xl sm:text-5xl font-bold">
-              {playerRow.display_name || playerRow.identifier}
+              {formatPlayerName(playerRow.display_name || playerRow.identifier, isOwner)}
             </h1>
             {ownership && (ownership as any).display_name && (
               <VerifiedBadge 

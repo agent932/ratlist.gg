@@ -5,6 +5,9 @@ node_modules/
 
 # Testing
 /coverage
+/playwright-report/
+/test-results/
+/playwright/.cache/
 
 # Next.js
 /.next/
@@ -50,21 +53,33 @@ next-env.d.ts
 # Supabase
 .supabase/
 
-# Test artifacts
-/playwright-report/
-/test-results/
-/playwright/.cache/
-
 # Playwright MCP
 .playwright-mcp/
 
-# Spec-kit artifacts
+# Spec-kit artifacts (development workflow tool)
 .specify/
 
-# Development scripts output
+# Development/debugging scripts
+scripts/test-*.ts
+scripts/inspect-*.ts
+scripts/sync-*.ts
+scripts/validate-*.ts
 scripts/*.log
 scripts/*.txt
 
-# Documentation drafts
+# Ad-hoc SQL files (not migrations)
+/*.sql
+!supabase/migrations/*.sql
+!supabase/seed.sql
+
+# Documentation drafts & internal notes
 *.draft.md
 *.wip.md
+PROJECT_CLEANUP_SUMMARY.md
+DEPLOYMENT_CHECKLIST.md
+DATABASE_SETUP.md
+
+# Temporary files
+*.tmp
+*.temp
+*.bak

@@ -73,7 +73,7 @@ export function Header() {
       }
     })
     return () => subscription.unsubscribe()
-  }, [])
+  }, [supabase])
 
   // Refetch auth state when page becomes visible (handles mobile browser tab switching)
   useEffect(() => {

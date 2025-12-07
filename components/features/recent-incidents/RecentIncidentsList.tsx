@@ -43,7 +43,7 @@ export function RecentIncidentsList({ incidents }: RecentIncidentsListProps) {
                 </span>
                 <span className="text-white/20">•</span>
                 <a 
-                  href={`/player/${gameSlug}/${encodeURIComponent(incident.player_identifier)}`}
+                  href={`/player/${gameSlug}/${encodeURIComponent(formatPlayerName(incident.player_identifier))}`}
                   className="text-sm font-semibold text-white/90 hover:text-brand transition-colors"
                 >
                   {formatPlayerName(incident.player_display_name || incident.player_identifier)}
