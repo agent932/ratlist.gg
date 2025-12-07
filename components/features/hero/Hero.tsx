@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { PlayerSearchAutocomplete } from './PlayerSearchAutocomplete'
 
 interface HeroProps {
   stats: {
@@ -72,42 +72,9 @@ export function Hero({ stats }: HeroProps) {
 
           {/* Search box */}
           <div className="mt-16">
-            <form 
-              onSubmit={(e) => {
-                e.preventDefault()
-                const formData = new FormData(e.currentTarget)
-                const playerId = formData.get('playerId') as string
-                if (playerId) {
-                  window.location.href = `/player/tarkov/${encodeURIComponent(playerId)}`
-                }
-              }} 
-              className="mx-auto flex flex-col sm:flex-row max-w-2xl items-stretch gap-3"
-            >
-              <div className="relative flex-1">
-                <svg 
-                  className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <Input 
-                  name="playerId" 
-                  placeholder="Search player by identifier..." 
-                  required 
-                  className="pl-12 h-14 bg-white/5 border-white/10 backdrop-blur-sm text-base sm:text-lg w-full"
-                />
-              </div>
-              <button 
-                className="h-14 rounded-lg bg-brand px-8 font-semibold text-brand-foreground hover:bg-brand/90 transition-colors whitespace-nowrap" 
-                type="submit"
-              >
-                Search
-              </button>
-            </form>
+            <PlayerSearchAutocomplete />
             <p className="mt-3 text-sm text-white/40">
-              Try searching: &quot;Player123&quot; or any in-game username
+              Start typing to see player suggestions
             </p>
           </div>
 
