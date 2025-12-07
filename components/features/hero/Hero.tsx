@@ -3,7 +3,15 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-export function Hero() {
+interface HeroProps {
+  stats: {
+    incidents: number
+    players: number
+    users: number
+  }
+}
+
+export function Hero({ stats }: HeroProps) {
   return (
     <section className="relative overflow-hidden">
       {/* Background gradient */}
@@ -106,16 +114,16 @@ export function Hero() {
           {/* Stats */}
           <div className="mt-20 grid grid-cols-3 gap-3 sm:gap-8 max-w-2xl mx-auto">
             <div className="rounded-lg border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-sm">
-              <div className="text-2xl sm:text-3xl font-bold text-brand">1,000+</div>
+              <div className="text-2xl sm:text-3xl font-bold text-brand">{stats.incidents.toLocaleString()}</div>
               <div className="mt-1 text-xs sm:text-sm text-white/60">Reports Filed</div>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-sm">
-              <div className="text-2xl sm:text-3xl font-bold text-brand">500+</div>
+              <div className="text-2xl sm:text-3xl font-bold text-brand">{stats.players.toLocaleString()}</div>
               <div className="mt-1 text-xs sm:text-sm text-white/60">Players Tracked</div>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/5 p-4 sm:p-6 backdrop-blur-sm">
-              <div className="text-2xl sm:text-3xl font-bold text-brand">24/7</div>
-              <div className="mt-1 text-xs sm:text-sm text-white/60">Community Active</div>
+              <div className="text-2xl sm:text-3xl font-bold text-brand">{stats.users.toLocaleString()}</div>
+              <div className="mt-1 text-xs sm:text-sm text-white/60">Active Users</div>
             </div>
           </div>
         </div>
