@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServer } from '@/lib/supabase/server'
+import { formatPlayerName } from '@/lib/utils/player'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,10 +32,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([])
     }
 
-    // Transform the data to include incident count
+    // Transform the data to include incident count and redact identifiers
     const suggestions = data.map((player: any) => ({
-      identifier: player.identifier,
-      display_name: player.display_name,
+      identifier: formatPlayerName(player.identifier), // Redact discriminator for privacy
+      display_name: player.display_name ? formatPlayerName(player.display_name) : null,
       incident_count: player.incidents?.[0]?.count || 0
     }))
 

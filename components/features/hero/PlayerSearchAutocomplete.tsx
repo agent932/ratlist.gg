@@ -66,6 +66,7 @@ export function PlayerSearchAutocomplete() {
   const handleSuggestionClick = (identifier: string) => {
     setQuery(identifier)
     setIsOpen(false)
+    // Identifier is already redacted from API, use it directly
     window.location.href = `/player/tarkov/${encodeURIComponent(identifier)}`
   }
 
