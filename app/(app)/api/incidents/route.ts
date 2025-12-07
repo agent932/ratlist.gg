@@ -20,6 +20,8 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get('status') || 'active'; // Default to active incidents
   const limit = parseInt(searchParams.get('limit') || '50');
 
+  console.log('[Incidents API] Query params:', { gameSlug, playerIdentifier, status });
+
   if (!gameSlug || !playerIdentifier) {
     return NextResponse.json(
       { error: 'Missing required parameters: game and player' },
@@ -36,6 +38,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (!game) {
+      console.log('[Incidents API] Game not found:', gameSlug);
       return NextResponse.json({ incidents: [] });
     }
 
@@ -47,7 +50,10 @@ export async function GET(request: NextRequest) {
       .eq('identifier', playerIdentifier)
       .single();
 
+    console.log('[Incidents API] Player lookup:', { playerIdentifier, found: !!player });
+
     if (!player) {
+      console.log('[Incidents API] Player not found:', playerIdentifier);
       return NextResponse.json({ incidents: [] });
     }
 

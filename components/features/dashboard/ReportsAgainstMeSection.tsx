@@ -64,6 +64,8 @@ export function ReportsAgainstMeSection() {
         const data = await response.json();
         const linkedPlayers = data.linked_players || [];
         
+        console.log('[ReportsAgainstMe] Linked players:', linkedPlayers);
+        
         if (linkedPlayers.length === 0) {
           setLoading(false);
           return;
@@ -76,6 +78,7 @@ export function ReportsAgainstMeSection() {
         for (const player of linkedPlayers) {
           // Fetch incidents for this player (API filters for active by default)
           const incidentsUrl = `/api/incidents?game=${encodeURIComponent(player.game_slug)}&player=${encodeURIComponent(player.player_id)}&status=active`;
+          console.log('[ReportsAgainstMe] Fetching incidents:', incidentsUrl);
           const incidentsResponse = await fetch(incidentsUrl);
           
           if (!incidentsResponse.ok) {
@@ -85,6 +88,8 @@ export function ReportsAgainstMeSection() {
           
           const incidentsData = await incidentsResponse.json();
           const incidents = incidentsData.incidents || [];
+          
+          console.log(`[ReportsAgainstMe] Incidents for ${player.player_id}:`, incidents.length, incidents);
 
           if (incidents.length > 0) {
             playersData.push({
