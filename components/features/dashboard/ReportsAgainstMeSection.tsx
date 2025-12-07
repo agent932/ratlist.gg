@@ -41,6 +41,7 @@ export function ReportsAgainstMeSection() {
   const { user, loading: userLoading } = useCurrentUser();
   const [playersWithIncidents, setPlayersWithIncidents] = useState<LinkedPlayerWithIncidents[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [totalIncidents, setTotalIncidents] = useState(0);
   const username = user?.display_name || user?.email || null;
 
@@ -52,56 +53,67 @@ export function ReportsAgainstMeSection() {
       }
 
       setLoading(true);
+      setError(null);
       try {
         // Fetch user profile with linked players and their incidents
         const response = await fetch(`/api/user/${username}`);
-        if (response.ok) {
-          const data = await response.json();
-          const linkedPlayers = data.linked_players || [];
-          
-          // For each linked player, fetch their incidents
-          const playersData: LinkedPlayerWithIncidents[] = [];
-          let total = 0;
-
-          for (const player of linkedPlayers) {
-            // Fetch incidents for this player (API now filters for active by default)
-            const incidentsResponse = await fetch(
-              `/api/incidents?game=${player.game_slug}&player=${player.player_id}&status=active`
-            );
-            
-            if (incidentsResponse.ok) {
-              const incidentsData = await incidentsResponse.json();
-              const incidents = incidentsData.incidents || [];
-
-              if (incidents.length > 0) {
-                playersData.push({
-                  player_id: player.player_id,
-                  game_name: player.game_name,
-                  game_slug: player.game_slug,
-                  tier: player.tier || 'F',
-                  incident_count: incidents.length,
-                  incidents: incidents.map((inc: IncidentData) => ({
-                    id: inc.id,
-                    player_id: player.player_id,
-                    game_name: player.game_name,
-                    game_slug: player.game_slug,
-                    category_name: inc.category_name || 'Unknown',
-                    severity: inc.severity || 'low',
-                    description: inc.description,
-                    status: inc.status,
-                    created_at: inc.created_at,
-                  })),
-                });
-                total += incidents.length;
-              }
-            }
-          }
-
-          setPlayersWithIncidents(playersData);
-          setTotalIncidents(total);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user profile: ${response.status}`);
         }
-      } catch (error) {
-        console.error('Failed to fetch reports against me:', error);
+        
+        const data = await response.json();
+        const linkedPlayers = data.linked_players || [];
+        
+        if (linkedPlayers.length === 0) {
+          setLoading(false);
+          return;
+        }
+        
+        // For each linked player, fetch their incidents
+        const playersData: LinkedPlayerWithIncidents[] = [];
+        let total = 0;
+
+        for (const player of linkedPlayers) {
+          // Fetch incidents for this player (API filters for active by default)
+          const incidentsUrl = `/api/incidents?game=${encodeURIComponent(player.game_slug)}&player=${encodeURIComponent(player.player_id)}&status=active`;
+          const incidentsResponse = await fetch(incidentsUrl);
+          
+          if (!incidentsResponse.ok) {
+            console.warn(`Failed to fetch incidents for ${player.player_id}:`, incidentsResponse.status);
+            continue;
+          }
+          
+          const incidentsData = await incidentsResponse.json();
+          const incidents = incidentsData.incidents || [];
+
+          if (incidents.length > 0) {
+            playersData.push({
+              player_id: player.player_id,
+              game_name: player.game_name,
+              game_slug: player.game_slug,
+              tier: player.tier || 'F',
+              incident_count: incidents.length,
+              incidents: incidents.map((inc: IncidentData) => ({
+                id: inc.id,
+                player_id: player.player_id,
+                game_name: player.game_name,
+                game_slug: player.game_slug,
+                category_name: inc.category_name || 'Unknown',
+                severity: inc.severity || 'low',
+                description: inc.description,
+                status: inc.status,
+                created_at: inc.created_at,
+              })),
+            });
+            total += incidents.length;
+          }
+        }
+
+        setPlayersWithIncidents(playersData);
+        setTotalIncidents(total);
+      } catch (err) {
+        console.error('Failed to fetch reports against me:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load reports');
       } finally {
         setLoading(false);
       }
@@ -121,6 +133,40 @@ export function ReportsAgainstMeSection() {
           </Card>
         ))}
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-12 border-red-500/20 bg-red-500/5 text-center">
+        <div className="max-w-md mx-auto">
+          <div className="mb-4">
+            <svg
+              className="mx-auto h-12 w-12 text-red-500/60"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-white mb-2">
+            Error Loading Reports
+          </h3>
+          <p className="text-white/60 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-brand hover:bg-brand/90 text-brand-foreground rounded-lg font-medium transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </Card>
     );
   }
 
