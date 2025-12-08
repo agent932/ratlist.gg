@@ -12,7 +12,7 @@ Vercel Hobby accounts only support **daily cron jobs** (runs once per day). The 
   "crons": [
     {
       "path": "/api/cron/send-notifications",
-      "schedule": "0 */1 * * *"  // Every hour (Hobby-compatible)
+      "schedule": "0 12 * * *"  // Daily at noon UTC
     },
     {
       "path": "/api/cron/reset-notification-counts",
@@ -23,14 +23,14 @@ Vercel Hobby accounts only support **daily cron jobs** (runs once per day). The 
 ```
 
 **Current Schedule**:
-- Email batch processor: **Every hour** (instead of every 5 minutes)
-- Daily counter reset: **Midnight UTC** (unchanged)
+- Email batch processor: **Daily at noon UTC** (12:00 PM UTC / 7:00 AM EST)
+- Daily counter reset: **Midnight UTC** (12:00 AM UTC / 7:00 PM EST previous day)
 
 ## Impact on User Experience
 
 - **Original**: Emails sent within 5 minutes of incident creation
-- **Current**: Emails sent within 1 hour of incident creation
-- **Still acceptable**: Most users won't notice the difference for non-urgent notifications
+- **Current**: Emails sent once per day at noon UTC
+- **Batch delivery**: All pending notifications from the past 24 hours sent together
 
 ## Alternatives for 5-Minute Delivery
 
