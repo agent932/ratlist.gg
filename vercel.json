@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/send-notifications",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/reset-notification-counts",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
