@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       status: string;
       created_at: string;
       category_id: number;
-      incident_categories: { name: string } | null;
+      incident_categories: { label: string } | null;
     }
 
     const { data: incidents, error } = await supabase
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
         created_at,
         category_id,
         incident_categories (
-          name
+          label
         )
       `)
       .eq('reported_player_id', player.id)
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
       status: inc.status,
       created_at: inc.created_at,
       category_id: inc.category_id,
-      category_name: inc.incident_categories?.name || 'Unknown',
+      category_name: inc.incident_categories?.label || 'Unknown',
     }));
 
     return NextResponse.json({ incidents: formattedIncidents });
