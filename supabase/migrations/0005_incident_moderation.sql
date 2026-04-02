@@ -76,15 +76,18 @@ begin
   -- Calculate reputation score (simple sum of category weights)
   select coalesce(sum(
     case c.slug
-      when 'betrayal' then -10
-      when 'extract-camping' then -5
-      when 'stream-sniping' then -7
-      when 'team-violation' then -8
-      when 'scamming' then -9
-      when 'cheating' then -12
-      when 'toxicity' then -6
-      when 'clutch-save' then 8
-      when 'helpful' then 5
+      when 'betrayal' then -5
+      when 'extract-camping' then -3
+      when 'stream-sniping' then -4
+      when 'team-violation' then -3
+      when 'cheating' then -10
+      when 'scamming' then -8
+      when 'toxicity' then -3
+      when 'griefing' then -5
+      when 'teaming' then -3
+      when 'friendly-fire' then -2
+      when 'clutch-save' then 5
+      when 'helpful' then 3
       else 0
     end
   ), 0)::int
@@ -95,12 +98,12 @@ begin
 
   -- Determine tier
   v_tier := case
-    when v_score >= 50 then 'S'
-    when v_score >= 20 then 'A'
-    when v_score >= 0 then 'B'
-    when v_score >= -10 then 'C'
-    when v_score >= -30 then 'D'
-    else 'F'
+    when v_score <= -20 then 'F'
+    when v_score <= -10 then 'D'
+    when v_score <= -3 then 'C'
+    when v_score < 3 then 'B'
+    when v_score < 10 then 'A'
+    else 'S'
   end;
 
   -- Get recent incidents

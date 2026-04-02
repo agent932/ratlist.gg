@@ -14,20 +14,30 @@ export const DEFAULT_WEIGHTS: CategoryWeights = {
   'extract-camping': -3,
   'stream-sniping': -4,
   'team-violation': -3,
-  'clutch-save': 3,
+  cheating: -10,
+  scamming: -8,
+  toxicity: -3,
+  griefing: -5,
+  teaming: -3,
+  'friendly-fire': -2,
+  'clutch-save': 5,
+  helpful: 3,
 }
 
 /**
  * Calculate total reputation score from incident category counts.
- * 
+ *
  * @param counts - Object mapping category names to their occurrence counts
  * @param weights - Category weight multipliers (defaults to DEFAULT_WEIGHTS)
  * @returns The calculated reputation score
- * 
+ *
  * @example
  * scoreFromCounts({ 'betrayal': 2, 'clutch-save': 1 }) // -10 + 3 = -7
  */
-export function scoreFromCounts(counts: Record<string, number>, weights = DEFAULT_WEIGHTS) {
+export function scoreFromCounts(
+  counts: Record<string, number>,
+  weights = DEFAULT_WEIGHTS
+) {
   let score = 0
   for (const [k, n] of Object.entries(counts)) {
     score += (weights[k] ?? 0) * n
@@ -37,10 +47,10 @@ export function scoreFromCounts(counts: Record<string, number>, weights = DEFAUL
 
 /**
  * Convert numeric reputation score to letter tier rating.
- * 
+ *
  * @param score - The reputation score to convert
  * @returns Letter tier from 'F' (worst) to 'S' (best)
- * 
+ *
  * Tier Ranges:
  * - F: score <= -20 (extremely toxic)
  * - D: -20 < score <= -10 (very negative)

@@ -81,7 +81,14 @@ select
     when 'extract-camping' then -3
     when 'stream-sniping' then -4
     when 'team-violation' then -3
-    when 'clutch-save' then 3
+    when 'cheating' then -10
+    when 'scamming' then -8
+    when 'toxicity' then -3
+    when 'griefing' then -5
+    when 'teaming' then -3
+    when 'friendly-fire' then -2
+    when 'clutch-save' then 5
+    when 'helpful' then 3
     else 0 end), 0) as score
 from public.players p
 join public.incidents i on i.reported_player_id = p.id
@@ -124,7 +131,15 @@ returns table (
         when 'extract-camping' then -3
         when 'stream-sniping' then -4
         when 'team-violation' then -3
-        when 'clutch-save' then 3 else 0 end) as score,
+        when 'cheating' then -10
+        when 'scamming' then -8
+        when 'toxicity' then -3
+        when 'griefing' then -5
+        when 'teaming' then -3
+        when 'friendly-fire' then -2
+        when 'clutch-save' then 5
+        when 'helpful' then 3
+        else 0 end) as score,
       count(*) as report_count
     from public.players p
     join public.incidents i on i.reported_player_id = p.id
@@ -139,7 +154,7 @@ returns table (
     group by p.id, p.identifier, p.display_name
   )
   select player_id, identifier, display_name, report_count, score
-  from base order by report_count desc limit 100;
+  from base order by score asc, report_count desc limit 100;
 $$;
 
 -- RPC: recent incidents
