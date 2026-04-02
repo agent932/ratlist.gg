@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 export const dynamic = 'force-dynamic';
 
 export default async function ReportPage() {
-  const supabase = createSupabaseServer()
+  const supabase = await createSupabaseServer()
   
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/sign-in')

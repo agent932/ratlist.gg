@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const role = searchParams.get('role') || 'all';
     const limit = parseInt(searchParams.get('limit') || '20', 10);
 
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
     
     const { data, error } = await supabase.rpc('fn_search_users', {
       query,

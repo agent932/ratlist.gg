@@ -6,7 +6,7 @@ import { createSupabaseServer } from '@/lib/supabase/server';
 export async function GET(request: NextRequest) {
   try {
     const user = await requireAuth();
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
     const { searchParams } = new URL(request.url);
 
     const resolution = searchParams.get('resolution') || 'all';

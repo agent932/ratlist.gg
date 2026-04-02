@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { player_id, game_id } = linkPlayerSchema.parse(body);
     
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
     
     // Check if player ID is already claimed by another user
     const { data: existingLink, error: checkError } = await supabase
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
+        { error: 'Invalid request data', details: error.issues },
         { status: 400 }
       );
     }

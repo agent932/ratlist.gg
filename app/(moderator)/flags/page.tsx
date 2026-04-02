@@ -13,7 +13,7 @@ export const metadata = {
 };
 
 async function getFlagQueue(status: string = 'open') {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   
   const { data, error } = await supabase.rpc('fn_get_flag_queue', {
     status_filter: status,

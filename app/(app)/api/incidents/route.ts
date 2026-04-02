@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     return rateLimitedResponse();
   }
 
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const { searchParams } = new URL(request.url);
 
   const gameSlug = searchParams.get('game');
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
 }
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-  const supabase = createSupabaseServer()
+  const supabase = await createSupabaseServer()
   const supabaseAdmin = createSupabaseAdmin()
   
   const { data: { user } } = await supabase.auth.getUser()

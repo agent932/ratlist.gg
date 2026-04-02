@@ -10,7 +10,7 @@ export default async function BrowsePage({
 }: {
   searchParams: { game?: string; period?: string };
 }) {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const game = searchParams.game || 'tarkov';
   const period = searchParams.period || 'week';
 

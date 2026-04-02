@@ -18,7 +18,7 @@ export const metadata = {
 };
 
 async function searchUsers(query?: string, role?: string) {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   
   const { data, error } = await supabase.rpc('fn_search_users', {
     query: query || '',

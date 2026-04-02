@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { enabled } = toggleNotificationsSchema.parse(body);
     
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
     
     // Update notification preference
     const { error: updateError } = await supabase
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
+        { error: 'Invalid request data', details: error.issues },
         { status: 400 }
       );
     }

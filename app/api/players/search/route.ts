@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([])
     }
 
-    const supabase = createSupabaseServer()
+    const supabase = await createSupabaseServer()
 
     // Search for players matching the query with game information
     const { data, error } = await supabase

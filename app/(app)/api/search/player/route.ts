@@ -17,7 +17,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
   const parsed = PlayerSearchInput.safeParse({ game, q })
   if (!parsed.success) return badRequest('Invalid query')
 
-  const supabase = createSupabaseServer()
+  const supabase = await createSupabaseServer()
   const { data: gameRow } = await supabase.from('games').select('id, slug').eq('slug', game).single()
   if (!gameRow) return NextResponse.json({ results: [] })
 

@@ -8,13 +8,14 @@ import { LinkPlayerForm } from '@/components/features/user/LinkPlayerForm'
 import type { LinkedPlayer } from '@/lib/types'
 
 type PageProps = {
-  params: { username: string }
+  params: Promise<{ username: string }>
 }
 
 export async function generateMetadata({ params }: PageProps) {
+  const { username } = await params
   return {
-    title: `${params.username} | User Profile`,
-    description: `View ${params.username}'s profile and linked player IDs`,
+    title: `${username} | User Profile`,
+    description: `View ${username}'s profile and linked player IDs`,
   }
 }
 
@@ -32,11 +33,11 @@ async function getUserProfile(username: string) {
 }
 
 export default async function UserProfilePage({ params }: PageProps) {
-  const { username } = params
+  const { username } = await params
   const currentUser = await getCurrentUserWithRole()
-  
+
   const profile = await getUserProfile(username)
-  
+
   if (!profile) {
     redirect('/404')
   }
@@ -85,7 +86,9 @@ export default async function UserProfilePage({ params }: PageProps) {
           <div className="space-y-2 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-white/60">User ID:</span>
-              <span className="text-white/90 font-mono">{profile.admin.user_id}</span>
+              <span className="text-white/90 font-mono">
+                {profile.admin.user_id}
+              </span>
             </div>
             {profile.admin.is_suspended && (
               <>
@@ -114,7 +117,7 @@ export default async function UserProfilePage({ params }: PageProps) {
           <Card className="p-8 text-center border-white/10 bg-white/5">
             <p className="text-white/60">
               {isOwner
-                ? 'You haven\'t linked any player IDs yet'
+                ? "You haven't linked any player IDs yet"
                 : `${username} hasn't linked any player IDs`}
             </p>
           </Card>
@@ -137,14 +140,14 @@ export default async function UserProfilePage({ params }: PageProps) {
       </div>
 
       {/* Link Player Form (Owner Only) */}
-      {isOwner && (
-        <LinkPlayerForm onSuccess={() => window.location.reload()} />
-      )}
+      {isOwner && <LinkPlayerForm onSuccess={() => window.location.reload()} />}
 
       {/* Private Info (Owner Only) */}
       {isOwner && profile.private && (
         <Card className="p-6 border-white/10 bg-white/5 mt-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Account Settings</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">
+            Account Settings
+          </h2>
           <div className="space-y-2 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-white/60">Email:</span>
@@ -154,7 +157,9 @@ export default async function UserProfilePage({ params }: PageProps) {
               <div className="flex items-center justify-between">
                 <span className="text-white/60">Last Notification:</span>
                 <span className="text-white/90">
-                  {new Date(profile.private.last_notification_sent).toLocaleString()}
+                  {new Date(
+                    profile.private.last_notification_sent
+                  ).toLocaleString()}
                 </span>
               </div>
             )}

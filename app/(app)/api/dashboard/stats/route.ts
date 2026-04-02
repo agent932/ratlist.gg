@@ -6,7 +6,7 @@ import { createSupabaseServer } from '@/lib/supabase/server';
 export async function GET() {
   try {
     const user = await requireAuth();
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
 
     // Call the database function to get user stats
     const { data, error } = await supabase.rpc('fn_get_user_dashboard_stats', {

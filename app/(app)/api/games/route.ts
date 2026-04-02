@@ -4,7 +4,7 @@ import { createSupabaseServer } from '@/lib/supabase/server';
 
 export async function GET() {
   try {
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
 
     const { data: games, error } = await supabase
       .from('games')
