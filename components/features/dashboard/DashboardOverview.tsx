@@ -1,59 +1,36 @@
 // T005: DashboardOverview component - Stats cards and quick actions
-'use client';
+'use client'
 
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-
-interface DashboardStats {
-  linked_players_count: number;
-  incidents_submitted_count: number;
-  flags_submitted_count: number;
-  reports_against_me_count: number;
-}
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { useDashboardStats } from '@/hooks/useDashboardStats'
 
 export function DashboardOverview() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: stats, isLoading, isError } = useDashboardStats()
 
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        const response = await fetch('/api/dashboard/stats');
-        if (response.ok) {
-          const data = await response.json();
-          setStats(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch dashboard stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchStats();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <Card key={i} className="p-6 border-white/10 bg-white/5 animate-pulse">
+          <Card
+            key={i}
+            className="p-6 border-white/10 bg-white/5 animate-pulse"
+          >
             <div className="h-4 bg-white/10 rounded mb-2" />
             <div className="h-8 bg-white/10 rounded" />
           </Card>
         ))}
       </div>
-    );
+    )
   }
 
-  if (!stats) {
+  if (isError || !stats) {
     return (
       <Card className="p-6 border-white/10 bg-white/5">
         <p className="text-white/60">Failed to load dashboard stats</p>
       </Card>
-    );
+    )
   }
 
   const statCards = [
@@ -85,7 +62,7 @@ export function DashboardOverview() {
       bgColor: 'bg-orange-400/10',
       href: '/dashboard?tab=reports-against-me',
     },
-  ];
+  ]
 
   return (
     <div className="space-y-8">
@@ -117,22 +94,31 @@ export function DashboardOverview() {
             </Button>
           </Link>
           <Link href="/dashboard?tab=linked-players">
-            <Button variant="outline" className="w-full border-white/20 hover:bg-white/5">
+            <Button
+              variant="outline"
+              className="w-full border-white/20 hover:bg-white/5"
+            >
               Link Player ID
             </Button>
           </Link>
           <Link href="/dashboard?tab=my-reports">
-            <Button variant="outline" className="w-full border-white/20 hover:bg-white/5">
+            <Button
+              variant="outline"
+              className="w-full border-white/20 hover:bg-white/5"
+            >
               View My Reports
             </Button>
           </Link>
           <Link href="/dashboard?tab=my-flags">
-            <Button variant="outline" className="w-full border-white/20 hover:bg-white/5">
+            <Button
+              variant="outline"
+              className="w-full border-white/20 hover:bg-white/5"
+            >
               View My Flags
             </Button>
           </Link>
         </div>
       </Card>
     </div>
-  );
+  )
 }
