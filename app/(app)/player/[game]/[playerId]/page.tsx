@@ -114,6 +114,7 @@ export default async function PlayerPage({ params }: Props) {
     .from('incidents')
     .select('id, category_id, description, created_at')
     .eq('reported_player_id', playerRow.id)
+    .eq('status', 'active')
     .order('created_at', { ascending: false })
     .limit(20)
 

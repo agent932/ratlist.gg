@@ -23,7 +23,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { incidentIds, action, reason } = batchModerationSchema.parse(body);
+    const parsed = batchModerationSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+    const { incidentIds, action, reason } = parsed.data;
 
     const statusMap = {
       'hide': 'hidden',
@@ -91,13 +98,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Unauthorized: Admin access required' },
         { status: 403 }
-      );
-    }
-
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Invalid input', details: error.issues },
-        { status: 400 }
       );
     }
 

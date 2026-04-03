@@ -8,10 +8,11 @@ export const revalidate = 60 // Revalidate every 60 seconds
 async function getStats() {
   const supabase = await createSupabaseServer()
   
-  // Get total incidents
+  // Get total active incidents
   const { count: incidentCount } = await supabase
     .from('incidents')
     .select('*', { count: 'exact', head: true })
+    .eq('status', 'active')
   
   // Get total players
   const { count: playerCount } = await supabase
@@ -52,6 +53,7 @@ async function getRecentIncidents() {
         label
       )
     `)
+    .eq('status', 'active')
     .order('created_at', { ascending: false })
     .limit(5)
   
