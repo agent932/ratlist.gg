@@ -27,7 +27,7 @@ export async function GET() {
     const redactedPlayerName = redactDiscriminator(testNotification.player_identifier);
 
     // Render email template
-    const emailHtml = render(
+    const emailHtml = await render(
       React.createElement(IncidentNotificationEmail, {
         userName: testNotification.user_name,
         playerIdentifier: redactedPlayerName,
