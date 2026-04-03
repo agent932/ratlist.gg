@@ -6,7 +6,7 @@ import { createSupabaseServer } from '../lib/supabase/server'
 export const revalidate = 60 // Revalidate every 60 seconds
 
 async function getStats() {
-  const supabase = createSupabaseServer()
+  const supabase = await createSupabaseServer()
   
   // Get total incidents
   const { count: incidentCount } = await supabase
@@ -31,7 +31,7 @@ async function getStats() {
 }
 
 async function getRecentIncidents() {
-  const supabase = createSupabaseServer()
+  const supabase = await createSupabaseServer()
   
   const { data } = await supabase
     .from('incidents')
@@ -57,7 +57,8 @@ async function getRecentIncidents() {
   
   if (!data) return []
   
-  return data.map((incident: any) => ({
+  type RawIncident = typeof data[number]
+  return data.map((incident: RawIncident) => ({
     id: incident.id,
     reported_player_id: incident.reported_player_id,
     player_identifier: incident.players.identifier,

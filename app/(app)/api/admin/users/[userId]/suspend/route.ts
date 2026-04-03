@@ -12,7 +12,7 @@ const suspensionSchema = z.object({
 // POST: Suspend user
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     await requireAdmin();
@@ -25,7 +25,7 @@ export async function POST(
       );
     }
 
-    const userId = params.userId;
+    const { userId } = await params;
     const body = await request.json();
     
     const { duration, reason } = suspensionSchema.parse(body);
@@ -97,7 +97,6 @@ export async function POST(
       metadata: { duration, suspended_until: suspendedUntil.toISOString() },
     });
 
-    console.log(`User ${userId} suspended until ${suspendedUntil.toISOString()} by ${currentUser.email}`);
 
     return NextResponse.json({
       success: true,
@@ -133,7 +132,7 @@ export async function POST(
 // DELETE: Unsuspend user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     await requireAdmin();
@@ -146,7 +145,7 @@ export async function DELETE(
       );
     }
 
-    const userId = params.userId;
+    const { userId } = await params;
     
     // Prevent self-unsuspension (though this would be rare)
     if (currentUser.id === userId) {
@@ -192,7 +191,6 @@ export async function DELETE(
       reason: 'Suspension lifted by admin',
     });
 
-    console.log(`User ${userId} unsuspended by ${currentUser.email}`);
 
     return NextResponse.json({
       success: true,

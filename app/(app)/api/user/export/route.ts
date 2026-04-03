@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     const user = await requireAuth();
 
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
 
     // Fetch user profile
     const { data: profile } = await supabase

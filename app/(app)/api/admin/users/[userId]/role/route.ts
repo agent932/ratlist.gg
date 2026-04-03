@@ -10,7 +10,7 @@ const roleSchema = z.object({
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     // Require admin access and get current user
@@ -24,7 +24,7 @@ export async function PATCH(
       );
     }
 
-    const userId = params.userId;
+    const { userId } = await params;
     const body = await request.json();
     
     // Validate input
@@ -73,9 +73,11 @@ export async function PATCH(
     // Add audit logging for role changes
     await supabase.from('moderation_logs').insert({
       moderator_id: user.id,
-      action: 'role_change',
-      target_user_id: userId,
-      details: {
+      action: 'assign_role',
+      target_type: 'user',
+      target_id: userId,
+      reason: `Role changed from ${currentProfile?.role || 'unknown'} to ${role}`,
+      metadata: {
         old_role: currentProfile?.role || 'unknown',
         new_role: role,
       },

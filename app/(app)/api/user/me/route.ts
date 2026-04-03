@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const user = await requireAuth();
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
 
     const { data: profile, error } = await supabase
       .from('user_profiles')

@@ -18,7 +18,7 @@ export const metadata = {
 };
 
 async function searchUsers(query?: string, role?: string) {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   
   const { data, error } = await supabase.rpc('fn_search_users', {
     query: query || '',
@@ -37,7 +37,7 @@ async function searchUsers(query?: string, role?: string) {
 export default async function UserManagementPage({
   searchParams,
 }: {
-  searchParams: { q?: string; role?: string };
+  searchParams: Promise<{ q?: string; role?: string }>;
 }) {
   try {
     await requireAdmin();
@@ -45,7 +45,8 @@ export default async function UserManagementPage({
     redirect('/');
   }
 
-  const users = await searchUsers(searchParams.q, searchParams.role);
+  const { q, role } = await searchParams;
+  const users = await searchUsers(q, role);
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -62,13 +63,13 @@ export default async function UserManagementPage({
               type="text"
               name="q"
               placeholder="Search by display name or email..."
-              defaultValue={searchParams.q}
+              defaultValue={q}
               className="w-full px-4 py-2 bg-black/30 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-brand"
             />
           </div>
           <select
             name="role"
-            defaultValue={searchParams.role || ''}
+            defaultValue={role || ''}
             className="px-4 py-2 bg-black/30 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand"
           >
             <option value="">All Roles</option>
@@ -89,7 +90,7 @@ export default async function UserManagementPage({
       {users.length === 0 ? (
         <Card className="p-8 text-center border-white/10 bg-white/5">
           <p className="text-white/60">
-            {searchParams.q || searchParams.role
+            {q || role
               ? 'No users found matching your search'
               : 'Enter a search query to find users'}
           </p>

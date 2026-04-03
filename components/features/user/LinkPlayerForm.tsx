@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
-import { validateEmbarkID, EMBARK_ID_GAMES } from '@/lib/utils/validate-embark-id'
+import { validateEmbarkID, EMBARK_ID_GAMES } from '@/lib/validation/player-id'
 
 type Game = {
   id: string

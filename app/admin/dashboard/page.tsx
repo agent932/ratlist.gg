@@ -11,7 +11,7 @@ export const metadata = {
 };
 
 async function getAdminStats() {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   
   const { data, error } = await supabase.rpc('fn_get_admin_stats');
 

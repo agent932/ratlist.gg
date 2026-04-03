@@ -8,13 +8,14 @@ import { LinkPlayerForm } from '@/components/features/user/LinkPlayerForm'
 import type { LinkedPlayer } from '@/lib/types'
 
 type PageProps = {
-  params: { username: string }
+  params: Promise<{ username: string }>
 }
 
 export async function generateMetadata({ params }: PageProps) {
+  const { username } = await params
   return {
-    title: `${params.username} | User Profile`,
-    description: `View ${params.username}'s profile and linked player IDs`,
+    title: `${username} | User Profile`,
+    description: `View ${username}'s profile and linked player IDs`,
   }
 }
 
@@ -32,7 +33,7 @@ async function getUserProfile(username: string) {
 }
 
 export default async function UserProfilePage({ params }: PageProps) {
-  const { username } = params
+  const { username } = await params
   const currentUser = await getCurrentUserWithRole()
   
   const profile = await getUserProfile(username)

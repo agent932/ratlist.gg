@@ -12,7 +12,7 @@ const incidentModerationSchema = z.object({
 // PATCH: Update incident status (hide/remove/restore)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { incidentId: string } }
+  { params }: { params: Promise<{ incidentId: string }> }
 ) {
   try {
     await requireModerator();
@@ -25,7 +25,7 @@ export async function PATCH(
       );
     }
 
-    const incidentId = params.incidentId;
+    const { incidentId } = await params;
     const body = await request.json();
     
     const { status, reason } = incidentModerationSchema.parse(body);
@@ -84,7 +84,6 @@ export async function PATCH(
       metadata: { previous_status: data.status },
     });
 
-    console.log(`Incident ${incidentId} ${status} by ${currentUser.email}`);
 
     return NextResponse.json({
       success: true,

@@ -19,14 +19,15 @@ interface SimpleIncident {
   created_at: string;
 }
 
-type Props = { params: { game: string; playerId: string } }
+type Props = { params: Promise<{ game: string; playerId: string }> }
 
 export const revalidate = 180
 
 export default async function PlayerPage({ params }: Props) {
-  const supabase = createSupabaseServer()
+  const { game, playerId } = await params
+  const supabase = await createSupabaseServer()
 
-  const { data: gameRow } = await supabase.from('games').select('id, name, slug').eq('slug', params.game).single()
+  const { data: gameRow } = await supabase.from('games').select('id, name, slug').eq('slug', game).single()
   if (!gameRow) return (
     <div className="container py-24 text-center">
       <div className="rounded-lg border border-white/10 bg-white/5 backdrop-blur-sm p-12">
@@ -37,7 +38,7 @@ export default async function PlayerPage({ params }: Props) {
 
   // Handle both full identifiers (with #) and redacted ones (without #)
   // If no # in the playerId, search for any identifier starting with that name
-  const decodedPlayerId = decodeURIComponent(params.playerId)
+  const decodedPlayerId = decodeURIComponent(playerId)
   const hasDiscriminator = decodedPlayerId.includes('#')
   
   let playerQuery = supabase
@@ -76,7 +77,7 @@ export default async function PlayerPage({ params }: Props) {
   const isOwner: boolean = !!(user && ownership && (ownership as any).user_id === user.id)
 
   const rep = await supabase
-    .rpc('fn_get_player_profile', { game_slug: params.game, identifier: playerRow.identifier })
+    .rpc('fn_get_player_profile', { game_slug: game, identifier: playerRow.identifier })
     .maybeSingle()
 
   const profileData = rep.data as PlayerProfileData | null

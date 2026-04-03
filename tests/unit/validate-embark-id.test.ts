@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { EMBARK_ID_GAMES, validateEmbarkID } from '@/lib/utils/validate-embark-id';
+import { EMBARK_ID_GAMES, validateEmbarkID } from '@/lib/validation/player-id';
 
 describe('validateEmbarkID', () => {
   describe('EMBARK_ID_GAMES constant', () => {

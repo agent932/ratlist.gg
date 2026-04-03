@@ -11,7 +11,7 @@ const updateProfileSchema = z.object({
 export async function PATCH(request: Request) {
   try {
     const user = await requireAuth();
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
     const body = await request.json();
 
     const validatedData = updateProfileSchema.parse(body);

@@ -12,13 +12,13 @@ const flagUpdateSchema = z.object({
 // GET: Fetch single flag with full context
 export async function GET(
   request: NextRequest,
-  { params }: { params: { flagId: string } }
+  { params }: { params: Promise<{ flagId: string }> }
 ) {
   try {
     await requireModerator();
 
-    const supabase = createSupabaseServer();
-    const flagId = params.flagId;
+    const supabase = await createSupabaseServer();
+    const { flagId } = await params;
 
     const { data, error } = await supabase
       .from('flags')
@@ -69,7 +69,7 @@ export async function GET(
 // PATCH: Update flag status/resolution
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { flagId: string } }
+  { params }: { params: Promise<{ flagId: string }> }
 ) {
   try {
     await requireModerator();
@@ -82,7 +82,7 @@ export async function PATCH(
       );
     }
 
-    const flagId = params.flagId;
+    const { flagId } = await params;
     const body = await request.json();
     
     const { status, resolution } = flagUpdateSchema.parse(body);
@@ -122,8 +122,6 @@ export async function PATCH(
       );
     }
 
-    // TODO: Add audit logging
-    console.log(`Flag ${flagId} updated by ${currentUser.email}: ${status} - ${resolution || 'no resolution'}`);
 
     return NextResponse.json({
       success: true,

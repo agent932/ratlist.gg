@@ -18,7 +18,7 @@ export async function DELETE(request: NextRequest) {
     const body = await request.json();
     const { player_id, game_id } = unlinkPlayerSchema.parse(body);
     
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
     
     // Verify user owns this link
     const { data: existingLink, error: checkError } = await supabase

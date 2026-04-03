@@ -6,7 +6,7 @@ import type { LinkedPlayer } from '@/lib/types';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   // Apply rate limiting to prevent user enumeration
   const allowed = await rateLimit(request, publicRateLimiter);
@@ -15,8 +15,8 @@ export async function GET(
   }
 
   try {
-    const { username } = params;
-    const supabase = createSupabaseServer();
+    const { username } = await params;
+    const supabase = await createSupabaseServer();
     
     // Get current user (if logged in)
     const currentUser = await getCurrentUserWithRole();

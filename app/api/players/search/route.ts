@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([])
     }
 
-    const supabase = createSupabaseServer()
+    const supabase = await createSupabaseServer()
 
     // Search for players matching the query with game information
     const { data, error } = await supabase
@@ -35,7 +35,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform the data to include incident count and redact identifiers
-    const suggestions = data.map((player: any) => ({
+    type RawPlayer = typeof data[number]
+    const suggestions = data.map((player: RawPlayer) => ({
       identifier: formatPlayerName(player.identifier), // Redact discriminator for privacy
       display_name: player.display_name ? formatPlayerName(player.display_name) : null,
       game_slug: player.games.slug,

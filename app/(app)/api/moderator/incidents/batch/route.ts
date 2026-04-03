@@ -77,7 +77,6 @@ export async function POST(request: NextRequest) {
       await supabase.from('moderation_logs').insert(logEntries);
     }
 
-    console.log(`Batch ${action}: ${updatedCount} incidents by ${currentUser.email}`);
 
     return NextResponse.json({
       success: true,

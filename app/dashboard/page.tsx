@@ -17,7 +17,7 @@ export const metadata = {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: { tab?: string };
+  searchParams: Promise<{ tab?: string }>;
 }) {
   try {
     await requireAuth();
@@ -25,7 +25,7 @@ export default async function DashboardPage({
     redirect('/auth/sign-in');
   }
 
-  const tab = searchParams.tab;
+  const { tab } = await searchParams;
 
   return (
     <DashboardLayout>

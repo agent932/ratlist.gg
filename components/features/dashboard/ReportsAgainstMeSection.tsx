@@ -79,7 +79,6 @@ export function ReportsAgainstMeSection() {
           const incidentsResponse = await fetch(incidentsUrl);
           
           if (!incidentsResponse.ok) {
-            console.warn(`Failed to fetch incidents for ${player.player_id}:`, incidentsResponse.status);
             continue;
           }
           

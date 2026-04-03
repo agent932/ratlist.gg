@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { enabled } = toggleNotificationsSchema.parse(body);
     
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
     
     // Update notification preference
     const { error: updateError } = await supabase

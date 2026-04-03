@@ -8,11 +8,12 @@ export const dynamic = 'force-dynamic';
 export default async function BrowsePage({
   searchParams,
 }: {
-  searchParams: { game?: string; period?: string };
+  searchParams: Promise<{ game?: string; period?: string }>;
 }) {
-  const supabase = createSupabaseServer();
-  const game = searchParams.game || 'tarkov';
-  const period = searchParams.period || 'week';
+  const { game: gameParam, period: periodParam } = await searchParams;
+  const supabase = await createSupabaseServer();
+  const game = gameParam || 'tarkov';
+  const period = periodParam || 'week';
 
   // Fetch games for filter dropdown
   const { data: games } = await supabase.from('games').select('*').order('name');

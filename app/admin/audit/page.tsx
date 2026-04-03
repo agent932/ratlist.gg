@@ -18,7 +18,7 @@ export const metadata = {
 };
 
 async function getAuditLogs(limit: number = 50): Promise<AuditLogWithModerator[]> {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   
   const { data, error } = await supabase
     .from('moderation_logs')

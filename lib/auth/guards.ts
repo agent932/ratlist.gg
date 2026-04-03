@@ -1,14 +1,15 @@
 // M004: Auth guards and role checking utilities
 
 import { createSupabaseServer } from '@/lib/supabase/server';
+import type { UserRole } from '@/lib/types';
 
-export type UserRole = 'user' | 'moderator' | 'admin';
+export type { UserRole };
 
 /**
  * Get the current user's role from their profile
  */
 export async function getCurrentUserRole(): Promise<UserRole | null> {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   
   const { data: { user } } = await supabase.auth.getUser();
   
@@ -30,7 +31,7 @@ export async function getCurrentUserRole(): Promise<UserRole | null> {
  * Role hierarchy: admin > moderator > user
  */
 export async function hasRole(requiredRole: UserRole): Promise<boolean> {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   
   const { data, error } = await supabase
     .rpc('fn_user_has_role', { target_role: requiredRole });
@@ -71,7 +72,7 @@ export async function requireAdmin(): Promise<void> {
  * Get current user with role information
  */
 export async function getCurrentUserWithRole() {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   
   const { data: { user } } = await supabase.auth.getUser();
   
@@ -97,7 +98,7 @@ export async function getCurrentUserWithRole() {
  * Check if current user is authenticated
  */
 export async function requireAuth() {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   
   const { data: { user } } = await supabase.auth.getUser();
   
