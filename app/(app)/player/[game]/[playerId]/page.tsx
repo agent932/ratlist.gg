@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { createSupabaseServer } from '../../../../../lib/supabase/server'
 import { tierFromScore } from '../../../../../lib/reputation'
 import { Card } from '../../../../../components/ui/card'
@@ -22,6 +23,47 @@ interface SimpleIncident {
 type Props = { params: Promise<{ game: string; playerId: string }> }
 
 export const revalidate = 180
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { game, playerId } = await params
+  const supabase = await createSupabaseServer()
+
+  const decodedPlayerId = decodeURIComponent(playerId)
+
+  const { data: gameRow } = await supabase
+    .from('games')
+    .select('name')
+    .eq('slug', game)
+    .single()
+
+  const gameName = gameRow?.name ?? game
+
+  // Strip discriminator for display (e.g. "PlayerName#1234" -> "PlayerName")
+  const displayName = decodedPlayerId.includes('#')
+    ? decodedPlayerId.split('#')[0]
+    : decodedPlayerId
+
+  const title = `${displayName} – ${gameName} | Ratlist.gg`
+  const description = `View the community reputation, incident reports, and tier rating for ${displayName} in ${gameName} on Ratlist.gg.`
+  const url = `https://ratlist.gg/player/${game}/${playerId}`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: 'Ratlist.gg',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
+  }
+}
 
 export default async function PlayerPage({ params }: Props) {
   const { game, playerId } = await params

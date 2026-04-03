@@ -1,7 +1,25 @@
+import type { Metadata } from 'next'
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Supported Games | Ratlist.gg',
+  description: 'Browse player reputations and incident reports for supported extraction shooters and tactical games on Ratlist.gg.',
+  openGraph: {
+    title: 'Supported Games | Ratlist.gg',
+    description: 'Browse player reputations and incident reports for supported extraction shooters and tactical games on Ratlist.gg.',
+    url: 'https://ratlist.gg/games',
+    siteName: 'Ratlist.gg',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Supported Games | Ratlist.gg',
+    description: 'Browse player reputations and incident reports for supported extraction shooters and tactical games on Ratlist.gg.',
+  },
+}
 
 export default async function GamesPage() {
   const supabase = await createSupabaseServer();

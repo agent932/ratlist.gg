@@ -1,7 +1,25 @@
+import type { Metadata } from 'next'
 import { Hero } from '../components/features/hero/Hero'
 import { FeatureCards } from '../components/features/cards/FeatureCards'
 import { RecentIncidentsList } from '../components/features/recent-incidents/RecentIncidentsList'
 import { createSupabaseServer } from '../lib/supabase/server'
+
+export const metadata: Metadata = {
+  title: 'Ratlist.gg | Community Reputation Tracker for Extraction Shooters',
+  description: 'Track player reputations, browse incident reports, and protect your squad. The community-driven ratlist for extraction shooter games.',
+  openGraph: {
+    title: 'Ratlist.gg | Community Reputation Tracker for Extraction Shooters',
+    description: 'Track player reputations, browse incident reports, and protect your squad. The community-driven ratlist for extraction shooter games.',
+    url: 'https://ratlist.gg',
+    siteName: 'Ratlist.gg',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Ratlist.gg | Community Reputation Tracker for Extraction Shooters',
+    description: 'Track player reputations, browse incident reports, and protect your squad. The community-driven ratlist for extraction shooter games.',
+  },
+}
 
 export const revalidate = 60 // Revalidate every 60 seconds
 

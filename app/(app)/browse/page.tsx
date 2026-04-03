@@ -1,9 +1,27 @@
+import type { Metadata } from 'next'
 import { createSupabaseServer } from '@/lib/supabase/server'
 import { BrowseFilters } from '@/components/features/browse-filters/BrowseFilters'
 import { LeaderboardTable } from '@/components/features/leaderboard/LeaderboardTable'
 import { RecentIncidentsList } from '@/components/features/recent-incidents/RecentIncidentsList'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Browse the Ratlist | Ratlist.gg',
+  description: 'View the most reported players and recent incidents across all supported extraction shooter games.',
+  openGraph: {
+    title: 'Browse the Ratlist | Ratlist.gg',
+    description: 'View the most reported players and recent incidents across all supported extraction shooter games.',
+    url: 'https://ratlist.gg/browse',
+    siteName: 'Ratlist.gg',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Browse the Ratlist | Ratlist.gg',
+    description: 'View the most reported players and recent incidents across all supported extraction shooter games.',
+  },
+}
 
 export default async function BrowsePage({
   searchParams,

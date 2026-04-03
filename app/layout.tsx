@@ -10,6 +10,14 @@ import { Providers } from '@/components/providers/Providers'
 export const metadata: Metadata = {
   title: 'Ratlist.gg',
   description: 'Community incident board for extraction shooters',
+  metadataBase: new URL('https://ratlist.gg'),
+  openGraph: {
+    siteName: 'Ratlist.gg',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+  },
 }
 
 export const viewport = {
