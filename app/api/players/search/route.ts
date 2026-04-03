@@ -35,14 +35,19 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform the data to include incident count and redact identifiers
+    // Supabase infers joined relations as arrays; cast to single object (games!inner is always 1:1)
     type RawPlayer = typeof data[number]
-    const suggestions = data.map((player: RawPlayer) => ({
-      identifier: formatPlayerName(player.identifier), // Redact discriminator for privacy
-      display_name: player.display_name ? formatPlayerName(player.display_name) : null,
-      game_slug: player.games.slug,
-      game_name: player.games.name,
-      incident_count: player.incidents?.[0]?.count || 0
-    }))
+    type GameRow = { slug: string; name: string }
+    const suggestions = data.map((player: RawPlayer) => {
+      const game = (Array.isArray(player.games) ? player.games[0] : player.games) as GameRow
+      return {
+        identifier: formatPlayerName(player.identifier),
+        display_name: player.display_name ? formatPlayerName(player.display_name) : null,
+        game_slug: game.slug,
+        game_name: game.name,
+        incident_count: player.incidents?.[0]?.count || 0,
+      }
+    })
 
     return NextResponse.json(suggestions)
   } catch (error) {
