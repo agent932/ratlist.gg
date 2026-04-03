@@ -57,15 +57,17 @@ async function getRecentIncidents() {
   
   if (!data) return []
   
+  // Supabase infers !inner joins as arrays; cast to single objects
   type RawIncident = typeof data[number]
+  const toObj = <T,>(v: T | T[]): T => Array.isArray(v) ? v[0] : v
   return data.map((incident: RawIncident) => ({
     id: incident.id,
     reported_player_id: incident.reported_player_id,
-    player_identifier: incident.players.identifier,
-    player_display_name: incident.players.display_name,
+    player_identifier: toObj(incident.players as any).identifier,
+    player_display_name: toObj(incident.players as any).display_name,
     category_id: incident.category_id,
-    category_label: incident.incident_categories.label,
-    game_name: incident.games.name,
+    category_label: toObj(incident.incident_categories as any).label,
+    game_name: toObj(incident.games as any).name,
     description: incident.description,
     created_at: incident.created_at
   }))
