@@ -5,6 +5,7 @@ import { createSupabaseServer } from '@/lib/supabase/server';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import type { UserProfile } from '@/lib/types';
+import { UserActionButtons } from '@/components/features/admin/UserActionButtons';
 
 interface UserSearchResult extends UserProfile {
   email?: string;
@@ -44,6 +45,10 @@ export default async function UserManagementPage({
   } catch (error) {
     redirect('/');
   }
+
+  const supabase = await createSupabaseServer();
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
+  const currentUserId = currentUser?.id ?? '';
 
   const { q, role } = await searchParams;
   const users = await searchUsers(q, role);
@@ -146,9 +151,17 @@ export default async function UserManagementPage({
                       <strong>Until:</strong> {new Date(user.suspended_until).toLocaleString()}
                     </div>
                   )}
+
+                  <UserActionButtons
+                    userId={user.user_id}
+                    currentRole={user.role as 'user' | 'moderator' | 'admin'}
+                    isSuspended={!!(user.suspended_until && new Date(user.suspended_until) > new Date())}
+                    suspendedUntil={user.suspended_until ?? null}
+                    isSelf={user.user_id === currentUserId}
+                  />
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   {user.display_name ? (
                     <Link
                       href={`/user/${encodeURIComponent(user.display_name)}`}
@@ -161,7 +174,6 @@ export default async function UserManagementPage({
                       No Display Name
                     </span>
                   )}
-                  {/* Future: Add suspend/role management buttons */}
                 </div>
               </div>
             </Card>
