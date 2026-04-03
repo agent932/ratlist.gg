@@ -85,8 +85,8 @@ export default function ContactPage() {
                 <h3 className="text-xl font-semibold text-white mb-2">Technical Support</h3>
                 <p className="text-white/60 mb-3">
                   Experiencing bugs, errors, or technical issues with the platform? Email us at{' '}
-                  <a href="mailto:ratlistgg@gmail.com" className="text-brand hover:underline">
-                    ratlistgg@gmail.com
+                  <a href="mailto:info@ratlist.gg" className="text-brand hover:underline">
+                    info@ratlist.gg
                   </a>
                   {' '}with details about the issue.
                 </p>
@@ -112,8 +112,8 @@ export default function ContactPage() {
                 </p>
                 <p className="text-sm text-white/50 mb-2">
                   For formal legal requests or data deletion, contact{' '}
-                  <a href="mailto:ratlistgg@gmail.com" className="text-brand hover:underline">
-                    ratlistgg@gmail.com
+                  <a href="mailto:info@ratlist.gg" className="text-brand hover:underline">
+                    info@ratlist.gg
                   </a>
                   {' '}with your account details.
                 </p>
@@ -133,8 +133,8 @@ export default function ContactPage() {
                 <h3 className="text-xl font-semibold text-white mb-2">Business & Media</h3>
                 <p className="text-white/60 mb-3">
                   Interested in partnerships, collaborations, or press inquiries? Contact us at{' '}
-                  <a href="mailto:ratlistgg@gmail.com" className="text-brand hover:underline">
-                    ratlistgg@gmail.com
+                  <a href="mailto:info@ratlist.gg" className="text-brand hover:underline">
+                    info@ratlist.gg
                   </a>
                   .
                 </p>
@@ -178,13 +178,13 @@ export default function ContactPage() {
           </p>
           <div className="flex justify-center">
             <a 
-              href="mailto:ratlistgg@gmail.com"
+              href="mailto:info@ratlist.gg"
               className="inline-flex items-center gap-2 rounded-lg bg-brand hover:bg-brand/90 px-8 py-4 font-semibold text-brand-foreground transition-colors text-lg"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              ratlistgg@gmail.com
+              info@ratlist.gg
             </a>
           </div>
         </div>
