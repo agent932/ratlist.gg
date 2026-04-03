@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { validateEmbarkID, EMBARK_ID_GAMES } from '@/lib/utils/validate-embark-id'
+import { validateEmbarkID, EMBARK_ID_GAMES } from '@/lib/validation/player-id'
 
 type Game = { id: string; slug: string; name: string }
 type Category = { id: number; slug: string; label: string }

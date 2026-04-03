@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createSupabaseBrowser } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
-
-type UserRole = 'user' | 'moderator' | 'admin'
+import type { UserRole } from '@/lib/types'
 
 export function Header() {
   const [user, setUser] = useState<User | null>(null)
@@ -45,8 +44,6 @@ export function Header() {
     loadUser()
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.email)
-      
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
         // Immediately update user state and fetch role
         const currentUser = session?.user ?? null
@@ -83,7 +80,6 @@ export function Header() {
         const currentUser = session?.user ?? null
         
         if (currentUser !== user) {
-          console.log('Visibility change detected user state change')
           setUser(currentUser)
           
           if (currentUser) {
@@ -111,7 +107,6 @@ export function Header() {
   useEffect(() => {
     const handleStorageChange = async (e: StorageEvent) => {
       if (e.key?.includes('supabase.auth.token')) {
-        console.log('Storage event detected - auth token changed')
         const { data: { session } } = await supabase.auth.getSession()
         const currentUser = session?.user ?? null
         
@@ -140,21 +135,9 @@ export function Header() {
   }, [supabase])
 
   async function signOut() {
-    try {
-      console.log('Signing out...')
-      setMobileMenuOpen(false) // Close mobile menu first
-      const { error } = await supabase.auth.signOut()
-      if (error) {
-        console.error('Sign out error:', error)
-        throw error
-      }
-      console.log('Sign out successful, redirecting...')
-      window.location.href = '/'
-    } catch (error) {
-      console.error('Failed to sign out:', error)
-      // Still redirect even if there's an error
-      window.location.href = '/'
-    }
+    setMobileMenuOpen(false)
+    await supabase.auth.signOut()
+    window.location.href = '/'
   }
 
   return (

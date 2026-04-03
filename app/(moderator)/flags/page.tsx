@@ -31,7 +31,7 @@ async function getFlagQueue(status: string = 'open') {
 export default async function FlagQueuePage({
   searchParams,
 }: {
-  searchParams: { tab?: string };
+  searchParams: Promise<{ tab?: string }>;
 }) {
   try {
     await requireModerator();
@@ -39,7 +39,8 @@ export default async function FlagQueuePage({
     redirect('/');
   }
 
-  const activeTab = searchParams.tab || 'open';
+  const { tab } = await searchParams;
+  const activeTab = tab || 'open';
   const flags = await getFlagQueue(activeTab);
 
   return (

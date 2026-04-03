@@ -3,7 +3,7 @@ import { withErrorHandling, badRequest, unauthorized } from '../../../../lib/htt
 import { createSupabaseServer, createSupabaseAdmin } from '../../../../lib/supabase/server'
 import { IncidentInput } from '../../../../lib/validation/incident'
 import { revalidatePath } from 'next/cache'
-import { checkRateLimit, recordSubmission, rateLimit, rateLimitedResponse, publicRateLimiter, mutationRateLimiter } from '../../../../lib/rate-limit'
+import { rateLimit, rateLimitedResponse, publicRateLimiter, mutationRateLimiter } from '../../../../lib/rate-limit'
 
 export async function GET(request: NextRequest) {
   // Apply rate limiting to prevent scraping
@@ -111,14 +111,15 @@ export async function GET(request: NextRequest) {
 }
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
+  const allowed = await rateLimit(req, mutationRateLimiter)
+  if (!allowed) return rateLimitedResponse()
+
+
   const supabase = await createSupabaseServer()
   const supabaseAdmin = createSupabaseAdmin()
-  
+
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return unauthorized('Sign in required')
-
-  const rateCheck = checkRateLimit(user.id)
-  if (!rateCheck.ok) return badRequest(rateCheck.reason!)
 
   const body = await req.json()
   const parsed = IncidentInput.safeParse(body)
@@ -164,8 +165,6 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     .single()
 
   if (error) return badRequest('Failed to submit incident')
-
-  recordSubmission(user.id)
 
   // Revalidate affected pages
   const { data: gameRow } = await supabase.from('games').select('slug').eq('id', game_id).single()

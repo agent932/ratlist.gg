@@ -23,11 +23,6 @@ export default function SignInPage() {
     setError(null)
 
     try {
-      console.log('🔐 Attempting authentication...')
-      console.log('Mode:', mode)
-      console.log('Email:', email)
-      console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
-      
       if (mode === 'signup') {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -36,16 +31,12 @@ export default function SignInPage() {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         })
-        
-        if (error) {
-          console.error('❌ Sign up error:', error)
-          throw error
-        }
-        
+
+        if (error) throw error
+
         if (data?.user?.identities?.length === 0) {
           setError('An account with this email already exists')
         } else {
-          console.log('✅ Sign up successful')
           setSent(true)
         }
       } else {
@@ -53,24 +44,18 @@ export default function SignInPage() {
           email,
           password,
         })
-        
-        if (error) {
-          console.error('❌ Sign in error:', error)
-          throw error
-        }
-        
-        console.log('✅ Sign in successful, redirecting...')
+
+        if (error) throw error
+
         router.push('/dashboard')
         router.refresh()
       }
     } catch (err: any) {
-      console.error('💥 Auth error:', err)
       const errorMessage = err.message || 'Authentication failed'
-      setError(errorMessage)
-      
-      // Additional diagnostic info
       if (err.message?.includes('fetch')) {
-        setError('Network error: Cannot connect to authentication server. Check if Supabase is running.')
+        setError('Network error: Cannot connect to authentication server.')
+      } else {
+        setError(errorMessage)
       }
     } finally {
       setLoading(false)

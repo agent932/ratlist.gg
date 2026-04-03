@@ -81,7 +81,6 @@ export async function PATCH(
       metadata: { previous_status: data.status },
     })
 
-    console.log(`Incident ${incidentId} ${status} by ${currentUser.email}`)
 
     return NextResponse.json({
       success: true,

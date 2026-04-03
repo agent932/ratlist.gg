@@ -57,7 +57,8 @@ async function getRecentIncidents() {
   
   if (!data) return []
   
-  return data.map((incident: any) => ({
+  type RawIncident = typeof data[number]
+  return data.map((incident: RawIncident) => ({
     id: incident.id,
     reported_player_id: incident.reported_player_id,
     player_identifier: incident.players.identifier,

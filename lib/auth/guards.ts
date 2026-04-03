@@ -1,8 +1,9 @@
 // M004: Auth guards and role checking utilities
 
 import { createSupabaseServer } from '@/lib/supabase/server';
+import type { UserRole } from '@/lib/types';
 
-export type UserRole = 'user' | 'moderator' | 'admin';
+export type { UserRole };
 
 /**
  * Get the current user's role from their profile

@@ -123,10 +123,6 @@ export async function PATCH(
       return NextResponse.json({ error: 'Flag not found' }, { status: 404 })
     }
 
-    // TODO: Add audit logging
-    console.log(
-      `Flag ${flagId} updated by ${currentUser.email}: ${status} - ${resolution || 'no resolution'}`
-    )
 
     return NextResponse.json({
       success: true,

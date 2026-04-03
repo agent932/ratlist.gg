@@ -22,6 +22,7 @@ export async function GET(
   try {
     const supabase = await createSupabaseServer()
 
+
     // Get current user (if logged in)
     const currentUser = await getCurrentUserWithRole()
 

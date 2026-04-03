@@ -27,6 +27,7 @@ export async function POST(
 
     const { duration, reason } = suspensionSchema.parse(body)
 
+
     // Prevent self-suspension
     if (currentUser.id === userId) {
       return NextResponse.json(
@@ -91,9 +92,6 @@ export async function POST(
       metadata: { duration, suspended_until: suspendedUntil.toISOString() },
     })
 
-    console.log(
-      `User ${userId} suspended until ${suspendedUntil.toISOString()} by ${currentUser.email}`
-    )
 
     return NextResponse.json({
       success: true,
@@ -181,7 +179,6 @@ export async function DELETE(
       reason: 'Suspension lifted by admin',
     })
 
-    console.log(`User ${userId} unsuspended by ${currentUser.email}`)
 
     return NextResponse.json({
       success: true,

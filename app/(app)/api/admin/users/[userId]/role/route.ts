@@ -24,6 +24,7 @@ export async function PATCH(
 
     const body = await request.json()
 
+
     // Validate input
     const { role } = roleSchema.parse(body)
 
@@ -70,9 +71,11 @@ export async function PATCH(
     // Add audit logging for role changes
     await supabase.from('moderation_logs').insert({
       moderator_id: user.id,
-      action: 'role_change',
-      target_user_id: userId,
-      details: {
+      action: 'assign_role',
+      target_type: 'user',
+      target_id: userId,
+      reason: `Role changed from ${currentProfile?.role || 'unknown'} to ${role}`,
+      metadata: {
         old_role: currentProfile?.role || 'unknown',
         new_role: role,
       },
