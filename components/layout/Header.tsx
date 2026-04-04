@@ -5,63 +5,60 @@ import { createSupabaseBrowser } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import type { UserRole } from '@/lib/types'
 
-export function Header() {
-  const [user, setUser] = useState<User | null>(null)
-  const [userRole, setUserRole] = useState<UserRole>('user')
+interface HeaderProps {
+  initialUser?: { id: string; email?: string } | null
+  initialRole?: UserRole | null
+}
+
+export function Header({ initialUser = null, initialRole = null }: HeaderProps) {
+  // Seed from server-supplied values so the correct nav shows immediately on
+  // first paint without waiting for the client-side Supabase fetch to finish.
+  const [user, setUser] = useState<User | null>(initialUser as User | null)
+  const [userRole, setUserRole] = useState<UserRole>(initialRole ?? 'user')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(!initialUser)
   const supabase = createSupabaseBrowser()
 
   useEffect(() => {
+    async function fetchRole(userId: string): Promise<UserRole> {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('user_id', userId)
+        .single()
+      return (profile?.role as UserRole) ?? 'user'
+    }
+
     async function loadUser() {
       try {
-        // Check both session and user for most reliable state
         const { data: { session } } = await supabase.auth.getSession()
         const currentUser = session?.user ?? null
-        
         setUser(currentUser)
-        
+
         if (currentUser) {
-          // Fetch user role from profile
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('role')
-            .eq('user_id', currentUser.id)
-            .single()
-          
-          if (profile?.role) {
-            setUserRole(profile.role as UserRole)
+          // If the server already told us the role for this user, skip the extra fetch
+          if (initialUser?.id === currentUser.id && initialRole) {
+            setUserRole(initialRole)
+          } else {
+            setUserRole(await fetchRole(currentUser.id))
           }
         } else {
-          // Reset role when user signs out
           setUserRole('user')
         }
       } finally {
         setIsLoading(false)
       }
     }
-    
+
     loadUser()
-    
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-        // Immediately update user state and fetch role
         const currentUser = session?.user ?? null
         setUser(currentUser)
-        
         if (currentUser) {
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('role')
-            .eq('user_id', currentUser.id)
-            .single()
-          
-          if (profile?.role) {
-            setUserRole(profile.role as UserRole)
-          }
+          setUserRole(await fetchRole(currentUser.id))
         }
-        
-        // Close mobile menu when user signs in
         setMobileMenuOpen(false)
       } else if (event === 'SIGNED_OUT') {
         setUser(null)

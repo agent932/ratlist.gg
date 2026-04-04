@@ -6,6 +6,7 @@ import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Providers } from '@/components/providers/Providers'
+import { getCurrentUserWithRole } from '@/lib/auth/guards'
 
 export const metadata: Metadata = {
   title: 'Ratlist.gg',
@@ -26,7 +27,8 @@ export const viewport = {
   maximumScale: 5,
 }
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const userWithRole = await getCurrentUserWithRole().catch(() => null)
   return (
     <html lang="en" className="dark">
       <body>
@@ -45,7 +47,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             `}
           </Script>
 
-          <Header />
+          <Header
+            initialUser={userWithRole ? { id: userWithRole.id, email: userWithRole.email } : null}
+            initialRole={userWithRole?.role ?? null}
+          />
           <main className="min-h-[calc(100vh-4rem)]">{children}</main>
           <footer className="border-t border-white/10 bg-black/50 backdrop-blur-xl py-12">
             <div className="container">
