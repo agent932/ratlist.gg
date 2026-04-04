@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/reset-notification-counts",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/send-admin-alerts",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

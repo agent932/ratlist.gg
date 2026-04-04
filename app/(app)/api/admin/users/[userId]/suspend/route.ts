@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin, getCurrentUserWithRole } from '@/lib/auth/guards'
 import { createSupabaseAdmin } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { notifyAdminsOfSuspension, sendSuspensionNoticeToUser } from '@/lib/email/sendAdminNotification'
 
 const suspensionSchema = z.object({
   duration: z.enum(['1hour', '24hours', '7days', '30days', 'permanent']),
@@ -92,6 +93,32 @@ export async function POST(
       metadata: { duration, suspended_until: suspendedUntil.toISOString() },
     })
 
+    // Fire-and-forget notifications
+    const { data: authUser } = await supabase.auth.admin.getUserById(userId)
+    if (authUser?.user) {
+      const durationLabels: Record<string, string> = {
+        '1hour': '1 Hour', '24hours': '24 Hours', '7days': '7 Days',
+        '30days': '30 Days', 'permanent': 'Permanent'
+      }
+      Promise.allSettled([
+        notifyAdminsOfSuspension({
+          suspendedUserDisplayName: data.display_name || 'Unknown',
+          suspendedUserEmail: authUser.user.email || '',
+          duration: durationLabels[duration] || duration,
+          reason,
+          suspendedBy: currentUser.displayName || 'Admin',
+          suspendedUntil: suspendedUntil.toISOString(),
+          userId,
+        }),
+        sendSuspensionNoticeToUser({
+          toEmail: authUser.user.email || '',
+          userName: data.display_name || 'User',
+          reason,
+          duration: durationLabels[duration] || duration,
+          suspendedUntil: suspendedUntil.toISOString(),
+        }),
+      ]).catch(console.error)
+    }
 
     return NextResponse.json({
       success: true,

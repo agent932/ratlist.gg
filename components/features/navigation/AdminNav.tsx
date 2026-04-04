@@ -15,6 +15,7 @@ const navItems: NavItem[] = [
   { label: 'Flag Queue', href: '/moderator/flags' },
   { label: 'Users', href: '/admin/users', requiresAdmin: true },
   { label: 'Audit Logs', href: '/admin/audit', requiresAdmin: true },
+  { label: 'Notifications', href: '/admin/notifications' },
 ];
 
 export function AdminNav({ isAdmin = false }: { isAdmin?: boolean }) {
