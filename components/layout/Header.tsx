@@ -191,24 +191,38 @@ export function Header() {
           {user && (userRole === 'moderator' || userRole === 'admin') && (
             <>
               <div className="ml-2 h-6 w-px bg-white/10" aria-hidden="true" />
-              <a 
-                href="/moderator/flags" 
+              <a
+                href="/moderator/flags"
                 className="px-4 py-2 rounded-lg text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-400/5 transition-colors"
                 aria-label="Moderator flags queue"
               >
                 Flags
               </a>
+              <a
+                href="/admin/notifications"
+                className="px-4 py-2 rounded-lg text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-400/5 transition-colors"
+                aria-label="Notification settings"
+              >
+                Notifications
+              </a>
               {userRole === 'admin' && (
                 <>
-                  <a 
-                    href="/admin/dashboard" 
+                  <a
+                    href="/admin/dashboard"
                     className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
                     aria-label="Admin dashboard"
                   >
-                    Dashboard
+                    Admin
                   </a>
-                  <a 
-                    href="/admin/audit" 
+                  <a
+                    href="/admin/users"
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
+                    aria-label="User management"
+                  >
+                    Users
+                  </a>
+                  <a
+                    href="/admin/audit"
                     className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
                     aria-label="Admin audit logs"
                   >
@@ -320,22 +334,34 @@ export function Header() {
                 <div className="px-2 text-xs font-semibold text-white/40 uppercase tracking-wider">
                   {userRole === 'admin' ? 'Admin' : 'Moderator'}
                 </div>
-                <a 
-                  href="/moderator/flags" 
+                <a
+                  href="/moderator/flags"
                   className="px-4 py-2 rounded-lg text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-400/5 transition-colors"
                 >
                   Review Flags
                 </a>
+                <a
+                  href="/admin/notifications"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-400/5 transition-colors"
+                >
+                  Notifications
+                </a>
                 {userRole === 'admin' && (
                   <>
-                    <a 
-                      href="/admin/dashboard" 
+                    <a
+                      href="/admin/dashboard"
                       className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
                     >
                       Admin Dashboard
                     </a>
-                    <a 
-                      href="/admin/audit" 
+                    <a
+                      href="/admin/users"
+                      className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
+                    >
+                      Users
+                    </a>
+                    <a
+                      href="/admin/audit"
                       className="px-4 py-2 rounded-lg text-sm font-medium text-purple-400/80 hover:text-purple-400 hover:bg-purple-400/5 transition-colors"
                     >
                       Audit Logs
