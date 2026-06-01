@@ -13,6 +13,12 @@ interface PlayerProfileData {
   last_incident_at: string | null
 }
 
+interface PlayerOwnership {
+  user_id: string
+  display_name: string | null
+  linked_at: string
+}
+
 interface SimpleIncident {
   id: string
   category_id: number
@@ -120,19 +126,16 @@ export default async function PlayerPage({ params }: Props) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { data: ownership } = await supabase
+  const { data: ownershipRaw } = await supabase
     .rpc('fn_get_player_ownership', {
       target_player_id: playerRow.identifier,
       target_game_id: gameRow.id,
     })
     .maybeSingle()
+  const ownership = ownershipRaw as PlayerOwnership | null
 
   // Check if current user is the owner
-  const isOwner: boolean = !!(
-    user &&
-    ownership &&
-    (ownership as any).user_id === user.id
-  )
+  const isOwner: boolean = !!(user && ownership && ownership.user_id === user.id)
 
   const rep = await supabase
     .rpc('fn_get_player_profile', {
@@ -202,10 +205,10 @@ export default async function PlayerPage({ params }: Props) {
                 isOwner
               )}
             </h1>
-            {ownership && (ownership as any).display_name && (
+            {ownership && ownership.display_name && (
               <VerifiedBadge
-                username={(ownership as any).display_name}
-                linkedAt={(ownership as any).linked_at}
+                username={ownership.display_name}
+                linkedAt={ownership.linked_at}
               />
             )}
           </div>
@@ -275,9 +278,15 @@ export default async function PlayerPage({ params }: Props) {
                         )}
                       </span>
                     </div>
-                    <p className="text-white/90 leading-relaxed">
+                    <p className="text-white/90 leading-relaxed mb-3">
                       {incident.description}
                     </p>
+                    <a
+                      href={`/incident/${incident.id}`}
+                      className="text-xs text-brand hover:text-brand/80 transition-colors"
+                    >
+                      View incident →
+                    </a>
                   </Card>
                 ))}
               </div>

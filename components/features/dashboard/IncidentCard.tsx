@@ -93,7 +93,7 @@ function IncidentCardComponent({ incident, showModerationInfo = false }: Inciden
         {/* View Details Link */}
         <div className="pt-2">
           <Link
-            href={`/player/${incident.game_slug}/${incident.player_id}#incident-${incident.id}`}
+            href={`/incident/${incident.id}`}
             className="text-sm text-brand hover:text-brand/80 transition-colors"
           >
             View Details →

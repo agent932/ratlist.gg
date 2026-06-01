@@ -40,7 +40,7 @@ type FlagQueueTableProps = {
 
 export function FlagQueueTable({ flags }: FlagQueueTableProps) {
   const [selectedFlag, setSelectedFlag] = useState<Flag | null>(null);
-  const [actionType, setActionType] = useState<'dismiss' | 'remove' | null>(null);
+  const [actionType, setActionType] = useState<'dismiss' | 'remove' | 'warn' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAction = async (flagId: string, resolution: string) => {
@@ -71,7 +71,7 @@ export function FlagQueueTable({ flags }: FlagQueueTableProps) {
     }
   };
 
-  const openConfirmation = (flag: Flag, action: 'dismiss' | 'remove') => {
+  const openConfirmation = (flag: Flag, action: 'dismiss' | 'remove' | 'warn') => {
     setSelectedFlag(flag);
     setActionType(action);
   };
@@ -117,7 +117,7 @@ export function FlagQueueTable({ flags }: FlagQueueTableProps) {
               </div>
 
               {flag.flag_status === 'open' && (
-                <div className="flex gap-2" role="group" aria-label="Flag actions">
+                <div className="flex flex-wrap gap-2" role="group" aria-label="Flag actions">
                   <Button
                     size="sm"
                     variant="outline"
@@ -126,6 +126,16 @@ export function FlagQueueTable({ flags }: FlagQueueTableProps) {
                     aria-label={`Dismiss flag for ${formatPlayerName(flag.reported_player_identifier)}`}
                   >
                     Dismiss
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
+                    onClick={() => openConfirmation(flag, 'warn')}
+                    disabled={isLoading}
+                    aria-label={`Warn reporter for ${formatPlayerName(flag.reported_player_identifier)}`}
+                  >
+                    Warn Reporter
                   </Button>
                   <Button
                     size="sm"
@@ -172,11 +182,13 @@ export function FlagQueueTable({ flags }: FlagQueueTableProps) {
         <AlertDialogContent className="bg-gray-900 border-white/10">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">
-              {actionType === 'dismiss' ? 'Dismiss Flag' : 'Remove Incident'}
+              {actionType === 'dismiss' ? 'Dismiss Flag' : actionType === 'warn' ? 'Warn Reporter' : 'Remove Incident'}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-white/60">
               {actionType === 'dismiss'
                 ? 'This will mark the flag as reviewed without taking action on the incident.'
+                : actionType === 'warn'
+                ? 'This will dismiss the flag and send a warning notification to the original reporter.'
                 : 'This will remove the incident from public view. This action affects the reported player\'s reputation.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -189,7 +201,7 @@ export function FlagQueueTable({ flags }: FlagQueueTableProps) {
                 if (selectedFlag && actionType) {
                   handleAction(
                     selectedFlag.flag_id,
-                    actionType === 'dismiss' ? 'dismissed' : 'removed_incident'
+                    actionType === 'dismiss' ? 'dismissed' : actionType === 'warn' ? 'warned_reporter' : 'removed_incident'
                   );
                 }
               }}

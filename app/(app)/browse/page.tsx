@@ -3,6 +3,7 @@ import { createSupabaseServer } from '@/lib/supabase/server'
 import { BrowseFilters } from '@/components/features/browse-filters/BrowseFilters'
 import { LeaderboardTable } from '@/components/features/leaderboard/LeaderboardTable'
 import { RecentIncidentsList } from '@/components/features/recent-incidents/RecentIncidentsList'
+import { tierFromScore } from '@/lib/reputation'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,21 +27,25 @@ export const metadata: Metadata = {
 export default async function BrowsePage({
   searchParams,
 }: {
-  searchParams: Promise<{ game?: string; period?: string }>
+  searchParams: Promise<{ game?: string; period?: string; tier?: string }>
 }) {
-  const { game: gameParam, period: periodParam } = await searchParams
+  const { game: gameParam, period: periodParam, tier: tierParam } = await searchParams
   const supabase = await createSupabaseServer()
   const game = gameParam || 'tarkov'
   const period = periodParam || 'week'
+  const tierFilter = tierParam || undefined
 
   // Fetch games for filter dropdown
   const { data: games } = await supabase.from('games').select('*').order('name')
 
-  // Fetch leaderboard via RPC
-  const { data: leaderboard } = await supabase.rpc('fn_get_leaderboard', {
+  // Fetch leaderboard via RPC, then filter by tier if specified
+  const { data: rawLeaderboard } = await supabase.rpc('fn_get_leaderboard', {
     game_slug: game,
     period: period,
   })
+  const leaderboard = tierFilter
+    ? (rawLeaderboard || []).filter((e: any) => tierFromScore(e.score) === tierFilter)
+    : rawLeaderboard
 
   // Fetch recent incidents via RPC
   const { data: recentIncidents } = await supabase.rpc(
@@ -104,6 +109,7 @@ export default async function BrowsePage({
             games={games || []}
             selectedGame={game}
             selectedPeriod={period}
+            selectedTier={tierFilter}
           />
         </div>
 
@@ -127,7 +133,7 @@ export default async function BrowsePage({
               Top Reported Players
             </h2>
           </div>
-          <LeaderboardTable entries={leaderboard || []} />
+          <LeaderboardTable entries={leaderboard || []} gameSlug={game} />
         </section>
 
         {/* Recent Incidents */}
