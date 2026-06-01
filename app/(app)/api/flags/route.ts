@@ -39,24 +39,24 @@ export async function POST(request: NextRequest) {
 
     // Fire-and-forget: notify mods with full incident context
     const adminClient = createSupabaseAdmin();
-    adminClient
-      .from('incidents')
-      .select(`description, incident_categories!inner(label), players!inner(identifier), games!inner(name)`)
-      .eq('id', incident_id)
-      .single()
-      .then(({ data: inc }) => {
-        if (!inc) return;
-        const toObj = <T,>(v: T | T[]): T => Array.isArray(v) ? v[0] : v;
-        notifyModsOfNewFlag({
-          flagReason: reason,
-          incidentDescription: inc.description,
-          categoryLabel: (toObj(inc.incident_categories as any) as any).label,
-          playerIdentifier: (toObj(inc.players as any) as any).identifier,
-          gameName: (toObj(inc.games as any) as any).name,
-          flaggedAt: new Date().toISOString(),
-        }).catch(console.error);
-      })
-      .catch(console.error);
+    Promise.resolve(
+      adminClient
+        .from('incidents')
+        .select(`description, incident_categories!inner(label), players!inner(identifier), games!inner(name)`)
+        .eq('id', incident_id)
+        .single()
+    ).then(({ data: inc }) => {
+      if (!inc) return;
+      const toObj = <T,>(v: T | T[]): T => Array.isArray(v) ? v[0] : v;
+      notifyModsOfNewFlag({
+        flagReason: reason,
+        incidentDescription: inc.description,
+        categoryLabel: (toObj(inc.incident_categories as any) as any).label,
+        playerIdentifier: (toObj(inc.players as any) as any).identifier,
+        gameName: (toObj(inc.games as any) as any).name,
+        flaggedAt: new Date().toISOString(),
+      }).catch(console.error);
+    }).catch(console.error);
 
     return NextResponse.json({ success: true, data: { id: flag.id } });
   } catch (error) {
