@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createSupabaseServer, createSupabaseAdmin } from '../../../../lib/supabase/server'
 import { CATEGORY_COLORS } from '../../../../lib/constants/colors'
-import { tierFromScore } from '../../../../lib/reputation'
+import { tierFromScore, scoreFromCounts } from '../../../../lib/reputation'
 import { formatPlayerName, playerProfileUrl } from '../../../../lib/utils/player'
 import { Card } from '../../../../components/ui/card'
 import { Badge } from '../../../../components/ui/badge'
@@ -96,14 +96,19 @@ export default async function IncidentDetailPage({ params }: Props) {
     reporterVerified = (linkRes.count ?? 0) > 0
   }
 
-  // Player reputation
-  const { data: rep } = await supabase
-    .rpc('fn_get_player_profile', {
-      game_slug: game.slug,
-      identifier: player.identifier,
-    })
-    .maybeSingle()
-  const score = (rep as any)?.score ?? 0
+  // Player reputation — direct query to avoid RPC inconsistency
+  const { data: playerIncidents } = await adminClient
+    .from('incidents')
+    .select('incident_categories(slug)')
+    .eq('reported_player_id', player.id)
+    .eq('status', 'active')
+  const toObjSlug = <T,>(v: T | T[]): T => Array.isArray(v) ? v[0] : v
+  const categoryCounts: Record<string, number> = {}
+  for (const inc of playerIncidents ?? []) {
+    const cat = inc.incident_categories ? toObjSlug(inc.incident_categories as any) as { slug: string } : null
+    if (cat?.slug) categoryCounts[cat.slug] = (categoryCounts[cat.slug] ?? 0) + 1
+  }
+  const score = scoreFromCounts(categoryCounts)
   const tier = tierFromScore(score)
 
   // Dispute/response (if table exists)
