@@ -72,18 +72,27 @@ export function BrowseFilters({ games, selectedGame, selectedPeriod, selectedTie
         </div>
 
         <div className="flex gap-2 items-center">
-          <label htmlFor="browse-period" className="text-sm font-medium text-white/70">Period:</label>
-          <select
-            id="browse-period"
-            name="period"
-            className="bg-slate-800 text-white px-3 py-1.5 rounded-lg border border-slate-600 text-sm focus:outline-none focus:border-brand"
-            value={selectedPeriod}
-            onChange={(e) => push({ period: e.target.value })}
-          >
-            <option value="week">Last 7 Days</option>
-            <option value="month">Last 30 Days</option>
-            <option value="all">All Time</option>
-          </select>
+          <span className="text-sm font-medium text-white/70">Period:</span>
+          <div className="flex rounded-lg border border-slate-600 overflow-hidden">
+            {[
+              { value: 'week', label: '7 Days' },
+              { value: 'month', label: '30 Days' },
+              { value: 'all', label: 'All Time' },
+            ].map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => push({ period: value })}
+                className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                  selectedPeriod === value
+                    ? 'bg-brand text-brand-foreground'
+                    : 'bg-slate-800 text-white/60 hover:text-white hover:bg-slate-700'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
