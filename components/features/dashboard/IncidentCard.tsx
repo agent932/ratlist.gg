@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { formatPlayerName, playerProfileUrl } from '@/lib/utils/player';
-import { SEVERITY_COLORS, STATUS_COLORS } from '@/lib/constants/colors';
+import { SEVERITY_COLORS, STATUS_COLORS, CATEGORY_ACCENT } from '@/lib/constants/colors';
 import { DisputeResponseForm } from './DisputeResponseForm';
 
 interface IncidentCardProps {
@@ -31,8 +31,11 @@ function IncidentCardComponent({ incident, showModerationInfo = false, showDispu
   const severityColor = SEVERITY_COLORS[incident.severity as keyof typeof SEVERITY_COLORS] || SEVERITY_COLORS.low;
   const statusColor = STATUS_COLORS[incident.status as keyof typeof STATUS_COLORS] || STATUS_COLORS.active;
 
+  const accentSlug = incident.category_name.toLowerCase().replace(/\s+/g, '-')
+  const accent = CATEGORY_ACCENT[accentSlug] ?? 'border-l-white/10'
+
   return (
-    <Card className="p-4 border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+    <Card className={`p-4 border-white/10 border-l-4 bg-white/5 hover:bg-white/10 transition-colors ${accent}`}>
       <div className="flex flex-col gap-3">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">

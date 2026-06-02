@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { formatPlayerName, playerProfileUrl } from '@/lib/utils/player';
-import { CATEGORY_COLORS } from '@/lib/constants/colors';
+import { CATEGORY_COLORS, CATEGORY_ACCENT } from '@/lib/constants/colors';
 
 interface RecentIncident {
   id: string;
@@ -33,7 +33,7 @@ export function RecentIncidentsList({ incidents }: RecentIncidentsListProps) {
 
         return (
           <div key={incident.id} role="listitem">
-            <Card className="p-4 sm:p-5 border-white/10 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors">
+            <Card className={`p-4 sm:p-5 border-white/10 border-l-4 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors ${CATEGORY_ACCENT[incident.category_label.toLowerCase().replace(/\s+/g, '-')] ?? 'border-l-white/10'}`}>
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs text-white/40">{incident.game_name || 'Unknown Game'}</span>
