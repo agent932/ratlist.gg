@@ -52,11 +52,22 @@ export async function POST(
 
     const { data: incident } = await adminClient
       .from('incidents')
-      .select('id, status, reported_player_id, games(id, slug)')
+      .select('id, status, reported_player_id, game_id')
       .eq('id', incidentId)
       .single()
 
     if (!incident || incident.status === 'removed') {
+      return NextResponse.json({ error: 'Incident not found' }, { status: 404 })
+    }
+
+    // Resolve the player UUID to their identifier string (player_links stores identifiers, not UUIDs)
+    const { data: playerRow } = await adminClient
+      .from('players')
+      .select('identifier, game_id')
+      .eq('id', incident.reported_player_id)
+      .single()
+
+    if (!playerRow) {
       return NextResponse.json({ error: 'Incident not found' }, { status: 404 })
     }
 
@@ -65,7 +76,8 @@ export async function POST(
       .from('player_links')
       .select('id')
       .eq('user_id', user.id)
-      .eq('player_id', incident.reported_player_id)
+      .eq('player_id', playerRow.identifier)
+      .eq('game_id', playerRow.game_id)
       .maybeSingle()
 
     if (!link) {
