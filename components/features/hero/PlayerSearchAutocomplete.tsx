@@ -10,6 +10,17 @@ interface PlayerSuggestion {
   game_slug: string
   game_name: string
   incident_count: number
+  score: number
+  tier: string
+}
+
+const tierColors: Record<string, string> = {
+  S: 'text-green-400 border-green-500/30 bg-green-500/10',
+  A: 'text-blue-400 border-blue-500/30 bg-blue-500/10',
+  B: 'text-slate-400 border-slate-500/30 bg-slate-500/10',
+  C: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10',
+  D: 'text-orange-400 border-orange-500/30 bg-orange-500/10',
+  F: 'text-red-400 border-red-500/30 bg-red-500/10',
 }
 
 export function PlayerSearchAutocomplete() {
@@ -136,7 +147,7 @@ export function PlayerSearchAutocomplete() {
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-0.5">
                       <span className="font-medium text-white truncate">
                         {formatPlayerName(suggestion.display_name || suggestion.identifier)}
                       </span>
@@ -144,15 +155,15 @@ export function PlayerSearchAutocomplete() {
                         {suggestion.game_name}
                       </span>
                     </div>
-                    {suggestion.display_name && (
-                      <div className="text-sm text-white/50 truncate">
-                        {suggestion.identifier}
-                      </div>
-                    )}
+                    <div className="text-xs text-white/40">
+                      {suggestion.incident_count > 0
+                        ? `${suggestion.incident_count} ${suggestion.incident_count === 1 ? 'report' : 'reports'}`
+                        : 'No reports'}
+                    </div>
                   </div>
                   <div className="flex-shrink-0">
-                    <span className="text-xs px-2 py-1 rounded-full bg-brand/20 text-brand font-medium">
-                      {suggestion.incident_count} {suggestion.incident_count === 1 ? 'report' : 'reports'}
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded border ${tierColors[suggestion.tier] ?? tierColors.B}`}>
+                      {suggestion.tier}
                     </span>
                   </div>
                 </div>
