@@ -14,6 +14,7 @@ const navItems: NavItem[] = [
   { label: 'Dashboard', href: '/admin/dashboard', requiresAdmin: true },
   { label: 'Flag Queue', href: '/moderator/flags' },
   { label: 'Users', href: '/admin/users', requiresAdmin: true },
+  { label: 'Games', href: '/admin/games', requiresAdmin: true },
   { label: 'Audit Logs', href: '/admin/audit', requiresAdmin: true },
   { label: 'Notifications', href: '/admin/notifications' },
 ];
