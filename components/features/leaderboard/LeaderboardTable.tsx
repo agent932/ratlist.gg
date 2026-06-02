@@ -17,60 +17,81 @@ interface LeaderboardTableProps {
   gameSlug?: string;
 }
 
+const rankStyles: Record<number, { row: string; rank: string; medal: string }> = {
+  0: { row: 'bg-amber-500/5 border-amber-500/20',  rank: 'text-amber-400 font-bold', medal: '🥇' },
+  1: { row: 'bg-slate-400/5 border-slate-400/20',  rank: 'text-slate-300 font-bold', medal: '🥈' },
+  2: { row: 'bg-amber-700/5 border-amber-700/20',  rank: 'text-amber-600 font-bold', medal: '🥉' },
+}
 
 export function LeaderboardTable({ entries, gameSlug }: LeaderboardTableProps) {
   if (!entries || entries.length === 0) {
     return (
-      <Card className="p-6 text-center text-slate-500">No data for this period</Card>
+      <Card className="p-8 text-center border-white/10 bg-white/5">
+        <p className="text-white/40">No players reported in this period</p>
+      </Card>
     );
   }
 
   return (
-    <Card className="p-4 sm:p-6 overflow-x-auto">
-      <table className="w-full min-w-[500px]" role="table" aria-label="Player leaderboard">
-        <thead>
-          <tr className="text-left border-b border-slate-700">
-            <th scope="col" className="pb-2 text-sm sm:text-base">Rank</th>
-            <th scope="col" className="pb-2 text-sm sm:text-base">Player</th>
-            <th scope="col" className="pb-2 text-center text-sm sm:text-base">Tier</th>
-            <th scope="col" className="pb-2 text-right text-sm sm:text-base">Reports</th>
-            <th scope="col" className="pb-2 text-right text-sm sm:text-base">Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((entry, idx) => {
-            const tier = tierFromScore(entry.score)
-            const slug = entry.game_slug || gameSlug
-            const profileHref = slug
-              ? playerProfileUrl(slug, entry.identifier)
-              : undefined
+    <div className="space-y-1.5">
+      {/* Header */}
+      <div className="grid grid-cols-[3rem_1fr_4rem_5rem_5rem] gap-2 px-4 pb-1 text-xs font-medium text-white/30 uppercase tracking-wider">
+        <span>#</span>
+        <span>Player</span>
+        <span className="text-center">Tier</span>
+        <span className="text-right">Reports</span>
+        <span className="text-right">Score</span>
+      </div>
 
-            return (
-              <tr key={entry.player_id} className="border-b border-slate-800">
-                <td className="py-3 text-sm sm:text-base text-white/50">{idx + 1}</td>
-                <td className="py-3 font-mono text-xs sm:text-sm truncate max-w-[150px] sm:max-w-none">
-                  {profileHref ? (
-                    <a href={profileHref} className="hover:text-brand transition-colors">
-                      {formatPlayerName(entry.display_name || entry.identifier)}
-                    </a>
-                  ) : (
-                    formatPlayerName(entry.display_name || entry.identifier)
-                  )}
-                </td>
-                <td className="py-3 text-center"><TierBadge tier={tier} size="sm" /></td>
-                <td className="py-3 text-right text-sm sm:text-base">{entry.report_count}</td>
-                <td
-                  className={`py-3 text-right font-semibold text-sm sm:text-base ${
-                    entry.score < 0 ? 'text-red-400' : 'text-green-400'
-                  }`}
-                >
-                  {entry.score}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </Card>
+      {entries.map((entry, idx) => {
+        const tier = tierFromScore(entry.score)
+        const slug = entry.game_slug || gameSlug
+        const profileHref = slug ? playerProfileUrl(slug, entry.identifier) : undefined
+        const style = rankStyles[idx]
+        const isTop3 = idx < 3
+
+        return (
+          <div
+            key={entry.player_id}
+            className={`grid grid-cols-[3rem_1fr_4rem_5rem_5rem] gap-2 items-center px-4 py-3 rounded-lg border transition-colors ${
+              isTop3
+                ? `${style.row} hover:brightness-110`
+                : 'border-white/5 bg-white/3 hover:bg-white/5'
+            }`}
+          >
+            {/* Rank */}
+            <span className={`text-sm ${isTop3 ? style.rank : 'text-white/30'}`}>
+              {isTop3 ? style.medal : idx + 1}
+            </span>
+
+            {/* Player */}
+            <span className="font-medium text-sm truncate">
+              {profileHref ? (
+                <a href={profileHref} className={`hover:text-brand transition-colors ${isTop3 ? 'text-white' : 'text-white/80'}`}>
+                  {formatPlayerName(entry.display_name || entry.identifier)}
+                </a>
+              ) : (
+                <span className={isTop3 ? 'text-white' : 'text-white/80'}>
+                  {formatPlayerName(entry.display_name || entry.identifier)}
+                </span>
+              )}
+            </span>
+
+            {/* Tier */}
+            <span className="text-center">
+              <TierBadge tier={tier} size="sm" />
+            </span>
+
+            {/* Reports */}
+            <span className="text-right text-sm text-white/60">{entry.report_count}</span>
+
+            {/* Score */}
+            <span className={`text-right text-sm font-semibold ${entry.score < 0 ? 'text-red-400' : 'text-green-400'}`}>
+              {entry.score}
+            </span>
+          </div>
+        )
+      })}
+    </div>
   );
 }
