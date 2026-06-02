@@ -45,7 +45,6 @@ export function RecentIncidentsList({ incidents }: RecentIncidentsListProps) {
                   <a
                     href={playerProfileUrl(gameSlug, incident.player_identifier)}
                     className="text-sm font-semibold text-white/90 hover:text-brand transition-colors"
-                    onClick={(e) => e.stopPropagation()}
                   >
                     {formatPlayerName(incident.player_display_name || incident.player_identifier)}
                   </a>
