@@ -27,7 +27,9 @@ interface SimpleIncident {
   created_at: string
 }
 
-type Props = { params: Promise<{ game: string; playerId: string }> }
+const PAGE_SIZE = 10
+
+type Props = { params: Promise<{ game: string; playerId: string }>; searchParams: Promise<{ page?: string }> }
 
 export const revalidate = 180
 
@@ -72,8 +74,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function PlayerPage({ params }: Props) {
+export default async function PlayerPage({ params, searchParams }: Props) {
   const { game, playerId } = await params
+  const { page: pageParam } = await searchParams
+  const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1)
   const supabase = await createSupabaseServer()
 
   const { data: gameRow } = await supabase
@@ -147,13 +151,16 @@ export default async function PlayerPage({ params }: Props) {
 
   const profileData = rep.data as PlayerProfileData | null
   const tier = profileData ? tierFromScore(profileData.score) : 'B'
-  const { data: incidents } = await supabase
+  const offset = (page - 1) * PAGE_SIZE
+  const { data: incidents, count: totalIncidents } = await supabase
     .from('incidents')
-    .select('id, category_id, description, created_at')
+    .select('id, category_id, description, created_at', { count: 'exact' })
     .eq('reported_player_id', playerRow.id)
     .eq('status', 'active')
     .order('created_at', { ascending: false })
-    .limit(20)
+    .range(offset, offset + PAGE_SIZE - 1)
+
+  const totalPages = Math.ceil((totalIncidents ?? 0) / PAGE_SIZE)
 
   return (
     <section className="relative overflow-hidden">
@@ -285,6 +292,37 @@ export default async function PlayerPage({ params }: Props) {
               <Card className="p-8 text-center border-white/10 bg-white/5 backdrop-blur-sm">
                 <p className="text-white/60">No incidents reported yet</p>
               </Card>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6 gap-4">
+                <a
+                  href={page > 1 ? `?page=${page - 1}` : undefined}
+                  aria-disabled={page <= 1}
+                  className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    page <= 1
+                      ? 'border-white/5 text-white/20 pointer-events-none'
+                      : 'border-white/20 text-white/70 hover:text-white hover:border-white/40'
+                  }`}
+                >
+                  ← Previous
+                </a>
+                <span className="text-sm text-white/40">
+                  Page {page} of {totalPages}
+                </span>
+                <a
+                  href={page < totalPages ? `?page=${page + 1}` : undefined}
+                  aria-disabled={page >= totalPages}
+                  className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    page >= totalPages
+                      ? 'border-white/5 text-white/20 pointer-events-none'
+                      : 'border-white/20 text-white/70 hover:text-white hover:border-white/40'
+                  }`}
+                >
+                  Next →
+                </a>
+              </div>
             )}
           </div>
 
