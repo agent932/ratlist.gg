@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { formatPlayerName } from '@/lib/utils/player';
 import { SEVERITY_COLORS, STATUS_COLORS } from '@/lib/constants/colors';
+import { DisputeResponseForm } from './DisputeResponseForm';
 
 interface IncidentCardProps {
   incident: {
@@ -23,9 +24,10 @@ interface IncidentCardProps {
     moderator_name?: string | null;
   };
   showModerationInfo?: boolean;
+  showDisputeForm?: boolean;
 }
 
-function IncidentCardComponent({ incident, showModerationInfo = false }: IncidentCardProps) {
+function IncidentCardComponent({ incident, showModerationInfo = false, showDisputeForm = false }: IncidentCardProps) {
   const severityColor = SEVERITY_COLORS[incident.severity as keyof typeof SEVERITY_COLORS] || SEVERITY_COLORS.low;
   const statusColor = STATUS_COLORS[incident.status as keyof typeof STATUS_COLORS] || STATUS_COLORS.active;
 
@@ -99,6 +101,9 @@ function IncidentCardComponent({ incident, showModerationInfo = false }: Inciden
             View Details →
           </Link>
         </div>
+
+        {/* Dispute / response form */}
+        {showDisputeForm && <DisputeResponseForm incidentId={incident.id} />}
       </div>
     </Card>
   );

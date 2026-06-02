@@ -8,6 +8,29 @@ const respondSchema = z.object({
   body: z.string().min(10, 'Response must be at least 10 characters').max(500),
 })
 
+// GET: fetch existing response for this incident (current user only)
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ incidentId: string }> }
+) {
+  try {
+    const user = await requireAuth()
+    const { incidentId } = await params
+
+    const supabase = await createSupabaseServer()
+    const { data } = await supabase
+      .from('incident_responses')
+      .select('id, body, created_at')
+      .eq('incident_id', incidentId)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    return NextResponse.json({ response: data ?? null })
+  } catch {
+    return NextResponse.json({ response: null })
+  }
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ incidentId: string }> }
@@ -27,7 +50,6 @@ export async function POST(
 
     const adminClient = createSupabaseAdmin()
 
-    // Fetch the incident to get the reported player
     const { data: incident } = await adminClient
       .from('incidents')
       .select('id, status, reported_player_id, games(id, slug)')
@@ -55,7 +77,6 @@ export async function POST(
 
     const supabase = await createSupabaseServer()
 
-    // Insert response (unique constraint enforces one per incident)
     const { data: response, error } = await supabase
       .from('incident_responses')
       .insert({ incident_id: incidentId, user_id: user.id, body: parsed.data.body })

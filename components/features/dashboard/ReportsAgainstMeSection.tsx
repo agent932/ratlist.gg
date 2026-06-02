@@ -319,6 +319,7 @@ export function ReportsAgainstMeSection() {
                 key={incident.id}
                 incident={incident}
                 showModerationInfo={false}
+                showDisputeForm={true}
               />
             ))}
           </div>
