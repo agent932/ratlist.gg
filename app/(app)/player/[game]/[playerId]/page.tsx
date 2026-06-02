@@ -332,38 +332,55 @@ export default async function PlayerPage({ params, searchParams }: Props) {
               Reputation Summary
             </h3>
 
-            <Card className="p-6 border-white/10 bg-white/5 backdrop-blur-sm space-y-4">
-              <div>
-                <div className="text-sm text-white/60 mb-1">Total Reports</div>
-                <div className="text-3xl font-bold">
-                  {profileData?.report_count ?? 0}
+            <Card className="p-6 border-white/10 bg-white/5 backdrop-blur-sm space-y-5">
+              {/* Tier + score hero */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs text-white/40 uppercase tracking-wider mb-1">Tier Rating</div>
+                  <TierBadge tier={tier} size="lg" />
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-white/40 uppercase tracking-wider mb-1">Score</div>
+                  <div className={`text-3xl font-bold ${(profileData?.score ?? 0) < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                    {profileData?.score ?? 0}
+                  </div>
                 </div>
               </div>
 
-              <div className="border-t border-white/10 pt-4">
-                <div className="text-sm text-white/60 mb-1">
-                  Reputation Score
-                </div>
-                <div
-                  className={`text-3xl font-bold ${(profileData?.score ?? 0) < 0 ? 'text-red-400' : 'text-green-400'}`}
-                >
-                  {profileData?.score ?? 0}
-                </div>
-              </div>
+              {/* Reputation bar — F(-20) to S(+10) */}
+              {(() => {
+                const score = profileData?.score ?? 0
+                const MIN = -25; const MAX = 15
+                const pct = Math.round(((score - MIN) / (MAX - MIN)) * 100)
+                const clamped = Math.min(100, Math.max(0, pct))
+                const barColor = score <= -20 ? 'bg-red-500' : score <= -10 ? 'bg-orange-500' : score <= -3 ? 'bg-yellow-500' : score < 3 ? 'bg-slate-400' : score < 10 ? 'bg-blue-400' : 'bg-green-500'
+                return (
+                  <div>
+                    <div className="flex justify-between text-xs text-white/30 mb-1.5">
+                      <span>F</span>
+                      <span className="text-white/50 text-xs">Reputation</span>
+                      <span>S</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${clamped}%` }} />
+                    </div>
+                  </div>
+                )
+              })()}
 
-              <div className="border-t border-white/10 pt-4">
-                <div className="text-sm text-white/60 mb-1">Tier Rating</div>
-                <TierBadge tier={tier} size="lg" />
-              </div>
-
-              <div className="border-t border-white/10 pt-4">
-                <div className="text-sm text-white/60 mb-1">Last Incident</div>
-                <div className="text-sm">
-                  {profileData?.last_incident_at
-                    ? new Date(
-                        profileData.last_incident_at
-                      ).toLocaleDateString()
-                    : 'No incidents'}
+              {/* Stats row */}
+              <div className="grid grid-cols-2 gap-3 pt-1 border-t border-white/10">
+                <div>
+                  <div className="text-xs text-white/40 mb-0.5">Total Reports</div>
+                  <div className="text-xl font-bold">{profileData?.report_count ?? 0}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-white/40 mb-0.5">Last Incident</div>
+                  <div className="text-sm text-white/70">
+                    {profileData?.last_incident_at
+                      ? new Date(profileData.last_incident_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                      : '—'}
+                  </div>
                 </div>
               </div>
             </Card>
