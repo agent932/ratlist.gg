@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { formatPlayerName } from '@/lib/utils/player';
 import { tierFromScore } from '@/lib/reputation';
+import { TierBadge } from '@/components/features/reputation/TierBadge';
 
 interface LeaderboardEntry {
   player_id: string;
@@ -16,14 +17,6 @@ interface LeaderboardTableProps {
   gameSlug?: string;
 }
 
-const tierColors: Record<string, string> = {
-  S: 'text-green-400',
-  A: 'text-blue-400',
-  B: 'text-slate-400',
-  C: 'text-yellow-400',
-  D: 'text-orange-400',
-  F: 'text-red-400',
-}
 
 export function LeaderboardTable({ entries, gameSlug }: LeaderboardTableProps) {
   if (!entries || entries.length === 0) {
@@ -64,7 +57,7 @@ export function LeaderboardTable({ entries, gameSlug }: LeaderboardTableProps) {
                     formatPlayerName(entry.display_name || entry.identifier)
                   )}
                 </td>
-                <td className={`py-3 text-center font-bold text-sm ${tierColors[tier]}`}>{tier}</td>
+                <td className="py-3 text-center"><TierBadge tier={tier} size="sm" /></td>
                 <td className="py-3 text-right text-sm sm:text-base">{entry.report_count}</td>
                 <td
                   className={`py-3 text-right font-semibold text-sm sm:text-base ${

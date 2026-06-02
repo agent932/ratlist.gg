@@ -1,8 +1,18 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 const TIERS = ['F', 'D', 'C', 'B', 'A', 'S'] as const;
+
+const TIER_LABELS: Record<string, string> = {
+  S: 'Exemplary', A: 'Positive', B: 'Neutral',
+  C: 'Negative', D: 'Very Negative', F: 'Extremely Toxic',
+};
+const TIER_RANGES: Record<string, string> = {
+  S: 'Score ≥ 10', A: 'Score 3 – 9', B: 'Score −2 – 2',
+  C: 'Score −3 – −9', D: 'Score −10 – −19', F: 'Score ≤ −20',
+};
 
 const tierChipColors: Record<string, string> = {
   S: 'border-green-500/40 text-green-400 hover:bg-green-500/10',
@@ -88,17 +98,28 @@ export function BrowseFilters({ games, selectedGame, selectedPeriod, selectedTie
           All
         </button>
         {TIERS.map((t) => (
-          <button
-            key={t}
-            onClick={() => push({ tier: selectedTier === t ? undefined : t })}
-            className={`px-3 py-1 rounded-full border text-xs font-bold transition-colors ${
-              selectedTier === t
-                ? tierChipActiveColors[t]
-                : `border-white/10 ${tierChipColors[t]}`
-            }`}
-          >
-            {t}
-          </button>
+          <TooltipProvider key={t} delayDuration={200}>
+            <TooltipRoot>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => push({ tier: selectedTier === t ? undefined : t })}
+                  className={`px-3 py-1 rounded-full border text-xs font-bold transition-colors ${
+                    selectedTier === t
+                      ? tierChipActiveColors[t]
+                      : `border-white/10 ${tierChipColors[t]}`
+                  }`}
+                >
+                  {t}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <div className="space-y-0.5">
+                  <div className="font-semibold">{TIER_LABELS[t]}</div>
+                  <div className="text-white/50">{TIER_RANGES[t]}</div>
+                </div>
+              </TooltipContent>
+            </TooltipRoot>
+          </TooltipProvider>
         ))}
       </div>
     </div>

@@ -3,6 +3,7 @@ import { createSupabaseServer } from '../../../../../lib/supabase/server'
 import { tierFromScore } from '../../../../../lib/reputation'
 import { Card } from '../../../../../components/ui/card'
 import { VerifiedBadge } from '../../../../../components/features/player/VerifiedBadge'
+import { TierBadge } from '../../../../../components/features/reputation/TierBadge'
 import { formatPlayerName } from '../../../../../lib/utils/player'
 
 interface PlayerProfileData {
@@ -146,15 +147,6 @@ export default async function PlayerPage({ params }: Props) {
 
   const profileData = rep.data as PlayerProfileData | null
   const tier = profileData ? tierFromScore(profileData.score) : 'B'
-  const tierColors: Record<string, string> = {
-    S: 'text-green-400',
-    A: 'text-blue-400',
-    B: 'text-slate-400',
-    C: 'text-yellow-400',
-    D: 'text-orange-400',
-    F: 'text-red-400',
-  }
-
   const { data: incidents } = await supabase
     .from('incidents')
     .select('id, category_id, description, created_at')
@@ -244,8 +236,7 @@ export default async function PlayerPage({ params }: Props) {
                   d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
                 />
               </svg>
-              Tier:{' '}
-              <span className={`font-bold ${tierColors[tier]}`}>{tier}</span>
+              Tier: <TierBadge tier={tier} size="sm" />
             </span>
           </div>
         </div>
@@ -324,9 +315,7 @@ export default async function PlayerPage({ params }: Props) {
 
               <div className="border-t border-white/10 pt-4">
                 <div className="text-sm text-white/60 mb-1">Tier Rating</div>
-                <div className={`text-4xl font-bold ${tierColors[tier]}`}>
-                  {tier}
-                </div>
+                <TierBadge tier={tier} size="lg" />
               </div>
 
               <div className="border-t border-white/10 pt-4">
