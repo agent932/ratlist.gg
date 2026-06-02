@@ -77,15 +77,23 @@ export default async function IncidentDetailPage({ params }: Props) {
     .eq('incident_id', incidentId)
     .eq('status', 'open')
 
-  // Reporter display (anonymous-aware)
+  // Reporter display (anonymous-aware) + verified status
   let reporterName: string | null = null
-  if (!incident.is_anonymous) {
-    const { data: reporterProfile } = await adminClient
-      .from('user_profiles')
-      .select('display_name')
-      .eq('user_id', (incident as any).reporter_user_id)
-      .maybeSingle()
-    reporterName = reporterProfile?.display_name ?? null
+  let reporterVerified = false
+  if (!incident.is_anonymous && (incident as any).reporter_user_id) {
+    const [profileRes, linkRes] = await Promise.all([
+      adminClient
+        .from('user_profiles')
+        .select('display_name')
+        .eq('user_id', (incident as any).reporter_user_id)
+        .maybeSingle(),
+      adminClient
+        .from('player_links')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', (incident as any).reporter_user_id),
+    ])
+    reporterName = profileRes.data?.display_name ?? null
+    reporterVerified = (linkRes.count ?? 0) > 0
   }
 
   // Player reputation
@@ -164,7 +172,19 @@ export default async function IncidentDetailPage({ params }: Props) {
                 year: 'numeric', month: 'long', day: 'numeric',
               })}
             </span>
-            {reporterName && <span>by <span className="text-white/70">{reporterName}</span></span>}
+            {reporterName && (
+              <span className="flex items-center gap-1.5">
+                by <span className="text-white/70">{reporterName}</span>
+                {reporterVerified && (
+                  <span title="This reporter has a linked player account" className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400">
+                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                    Verified
+                  </span>
+                )}
+              </span>
+            )}
             {incident.is_anonymous && <span className="italic">Anonymous report</span>}
           </div>
         </div>
