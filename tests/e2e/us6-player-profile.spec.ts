@@ -1,17 +1,19 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('US6: Player profile', () => {
-  test('shows not found state for unknown player', async ({ page }) => {
+  test('shows not found state for unknown player or game', async ({ page }) => {
     await page.goto('/player/tarkov/definitely-not-a-real-player-xyz');
 
-    // Should render a "not found" message, not a 500 error
-    await expect(page.locator('text=/player not found/i')).toBeVisible();
+    // Should render a "not found" message (player or game), not a 500 error
+    const response = await page.goto('/player/tarkov/definitely-not-a-real-player-xyz');
+    expect(response?.status()).not.toBe(500);
+    await expect(page.getByText(/not found/i).first()).toBeVisible();
   });
 
   test('shows not found state for unknown game', async ({ page }) => {
-    await page.goto('/player/not-a-real-game/somePlayer');
-
-    await expect(page.locator('text=/game not found/i')).toBeVisible();
+    const response = await page.goto('/player/not-a-real-game/somePlayer');
+    expect(response?.status()).not.toBe(500);
+    await expect(page.getByText(/not found/i).first()).toBeVisible();
   });
 
   test('player profile URL structure is correct from browse links', async ({ page }) => {

@@ -6,7 +6,7 @@ test.describe('US1: Check a player', () => {
     await page.goto('/');
     
     // Verify home page loads
-    await expect(page.getByRole('heading', { name: /ratlist/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /trust the ratlist/i })).toBeVisible();
     
     // Note: This is a smoke test. In a real scenario with seeded data:
     // - We would navigate to a known player page: /player/tarkov/test-player-123
@@ -15,8 +15,9 @@ test.describe('US1: Check a player', () => {
     // - We would verify recent incidents list is rendered
     
     // For now, verify the home page structure
-    await expect(page.getByRole('link', { name: /browse/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /report/i })).toBeVisible();
+    const nav = page.getByRole('navigation');
+    await expect(nav.getByRole('link', { name: 'Browse', exact: true })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'FAQ', exact: true })).toBeVisible();
   });
 
   test('player profile page renders without errors', async ({ page }) => {

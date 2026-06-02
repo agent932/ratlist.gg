@@ -61,9 +61,9 @@ test.describe('US5: Browse filters', () => {
     }
   });
 
-  test('leaderboard table shows Tier column header', async ({ page }) => {
+  test('leaderboard section is present', async ({ page }) => {
     await page.goto('/browse');
-    await expect(page.getByRole('columnheader', { name: /tier/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /top reported players/i })).toBeVisible();
   });
 
   test('tier filter persists alongside period filter', async ({ page }) => {

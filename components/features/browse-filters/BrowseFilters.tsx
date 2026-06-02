@@ -55,8 +55,9 @@ export function BrowseFilters({ games, selectedGame, selectedPeriod, selectedTie
     <div className="space-y-4">
       <div className="flex flex-wrap gap-4">
         <div className="flex gap-2 items-center">
-          <label className="text-sm font-medium text-white/70">Game:</label>
+          <label htmlFor="browse-game" className="text-sm font-medium text-white/70">Game:</label>
           <select
+            id="browse-game"
             name="game"
             className="bg-slate-800 text-white px-3 py-1.5 rounded-lg border border-slate-600 text-sm focus:outline-none focus:border-brand"
             value={selectedGame}
@@ -71,8 +72,9 @@ export function BrowseFilters({ games, selectedGame, selectedPeriod, selectedTie
         </div>
 
         <div className="flex gap-2 items-center">
-          <label className="text-sm font-medium text-white/70">Period:</label>
+          <label htmlFor="browse-period" className="text-sm font-medium text-white/70">Period:</label>
           <select
+            id="browse-period"
             name="period"
             className="bg-slate-800 text-white px-3 py-1.5 rounded-lg border border-slate-600 text-sm focus:outline-none focus:border-brand"
             value={selectedPeriod}
