@@ -2,7 +2,9 @@
 -- instead of relying on player_reputation_view which has INNER JOINs that can exclude players.
 -- Also adds status = 'active' filter to match the leaderboard.
 
-create or replace function public.fn_get_player_profile(game_slug text, identifier text)
+drop function if exists public.fn_get_player_profile(text, text);
+
+create function public.fn_get_player_profile(game_slug text, identifier text)
 returns table (
   game_id uuid,
   player_id uuid,
