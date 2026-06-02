@@ -1,18 +1,11 @@
 import type { Metadata } from 'next'
 import { createSupabaseServer } from '../../../../../lib/supabase/server'
-import { tierFromScore } from '../../../../../lib/reputation'
+import { tierFromScore, scoreFromCounts } from '../../../../../lib/reputation'
 import { Card } from '../../../../../components/ui/card'
 import { VerifiedBadge } from '../../../../../components/features/player/VerifiedBadge'
 import { TierBadge } from '../../../../../components/features/reputation/TierBadge'
 import { formatPlayerName } from '../../../../../lib/utils/player'
 
-interface PlayerProfileData {
-  score: number
-  total_incidents: number
-  active_incidents: number
-  report_count: number
-  last_incident_at: string | null
-}
 
 interface PlayerOwnership {
   user_id: string
@@ -142,24 +135,37 @@ export default async function PlayerPage({ params, searchParams }: Props) {
   // Check if current user is the owner
   const isOwner: boolean = !!(user && ownership && ownership.user_id === user.id)
 
-  const rep = await supabase
-    .rpc('fn_get_player_profile', {
-      game_slug: game,
-      identifier: playerRow.identifier,
-    })
-    .maybeSingle()
-
-  const profileData = rep.data as PlayerProfileData | null
-  const tier = profileData ? tierFromScore(profileData.score) : 'B'
+  // Fetch all active incidents with category slugs for score calculation + paginated list
   const offset = (page - 1) * PAGE_SIZE
-  const { data: incidents, count: totalIncidents } = await supabase
-    .from('incidents')
-    .select('id, category_id, description, created_at', { count: 'exact' })
-    .eq('reported_player_id', playerRow.id)
-    .eq('status', 'active')
-    .order('created_at', { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1)
+  const [{ data: allActiveIncidents }, { data: incidents, count: totalIncidents }] = await Promise.all([
+    supabase
+      .from('incidents')
+      .select('incident_categories(slug), created_at')
+      .eq('reported_player_id', playerRow.id)
+      .eq('status', 'active'),
+    supabase
+      .from('incidents')
+      .select('id, category_id, description, created_at', { count: 'exact' })
+      .eq('reported_player_id', playerRow.id)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + PAGE_SIZE - 1),
+  ])
 
+  // Compute score directly from category slugs
+  type CatRow = { incident_categories: { slug: string } | { slug: string }[] | null }
+  const toObj = <T,>(v: T | T[]): T => Array.isArray(v) ? v[0] : v
+  const categoryCounts: Record<string, number> = {}
+  let lastIncidentAt: string | null = null
+  for (const inc of allActiveIncidents ?? []) {
+    const cat = inc.incident_categories ? toObj(inc.incident_categories as any) as { slug: string } : null
+    if (cat?.slug) categoryCounts[cat.slug] = (categoryCounts[cat.slug] ?? 0) + 1
+    if (!lastIncidentAt || inc.created_at > lastIncidentAt) lastIncidentAt = inc.created_at
+  }
+  const score = scoreFromCounts(categoryCounts)
+  const reportCount = allActiveIncidents?.length ?? 0
+  const profileData = reportCount > 0 ? { score, report_count: reportCount, last_incident_at: lastIncidentAt } : null
+  const tier = tierFromScore(score)
   const totalPages = Math.ceil((totalIncidents ?? 0) / PAGE_SIZE)
 
   return (
