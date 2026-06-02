@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card';
-import { formatPlayerName } from '@/lib/utils/player';
+import { formatPlayerName, playerProfileUrl } from '@/lib/utils/player';
 import { CATEGORY_COLORS } from '@/lib/constants/colors';
 
 interface RecentIncident {
@@ -43,7 +43,7 @@ export function RecentIncidentsList({ incidents }: RecentIncidentsListProps) {
                   </span>
                   <span className="text-white/20">•</span>
                   <a
-                    href={`/player/${gameSlug}/${encodeURIComponent(incident.player_identifier)}`}
+                    href={playerProfileUrl(gameSlug, incident.player_identifier)}
                     className="text-sm font-semibold text-white/90 hover:text-brand transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >

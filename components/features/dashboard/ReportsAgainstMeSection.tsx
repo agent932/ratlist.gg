@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { IncidentCard } from './IncidentCard';
 import Link from 'next/link';
-import { formatPlayerName } from '@/lib/utils/player';
+import { formatPlayerName, playerProfileUrl } from '@/lib/utils/player';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 
 interface IncidentData {
@@ -240,7 +240,7 @@ export function ReportsAgainstMeSection() {
                       {playerData.game_name}
                     </Badge>
                     <Link
-                      href={`/player/${playerData.game_slug}/${playerData.player_id}`}
+                      href={playerProfileUrl(playerData.game_slug, playerData.player_id)}
                       className="text-sm font-medium text-white hover:text-brand transition-colors truncate"
                     >
                       {formatPlayerName(playerData.player_id, true)}
@@ -293,7 +293,7 @@ export function ReportsAgainstMeSection() {
                 {playerData.game_name}
               </Badge>
               <Link
-                href={`/player/${playerData.game_slug}/${playerData.player_id}`}
+                href={playerProfileUrl(playerData.game_slug, playerData.player_id)}
                 className="text-lg font-semibold text-white hover:text-brand transition-colors"
               >
                 {formatPlayerName(playerData.player_id, true)}

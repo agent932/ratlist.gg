@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card';
-import { formatPlayerName } from '@/lib/utils/player';
+import { formatPlayerName, playerProfileUrl } from '@/lib/utils/player';
 import { tierFromScore } from '@/lib/reputation';
 import { TierBadge } from '@/components/features/reputation/TierBadge';
 
@@ -42,7 +42,7 @@ export function LeaderboardTable({ entries, gameSlug }: LeaderboardTableProps) {
             const tier = tierFromScore(entry.score)
             const slug = entry.game_slug || gameSlug
             const profileHref = slug
-              ? `/player/${slug}/${encodeURIComponent(entry.identifier)}`
+              ? playerProfileUrl(slug, entry.identifier)
               : undefined
 
             return (

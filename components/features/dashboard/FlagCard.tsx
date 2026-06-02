@@ -3,7 +3,7 @@ import { memo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
-import { formatPlayerName } from '@/lib/utils/player';
+import { formatPlayerName, playerProfileUrl } from '@/lib/utils/player';
 import { RESOLUTION_COLORS } from '@/lib/constants/colors';
 
 interface FlagCardProps {
@@ -38,7 +38,7 @@ function FlagCardComponent({ flag }: FlagCardProps) {
                 {flag.game_name}
               </Badge>
               <Link
-                href={`/player/${flag.game_slug}/${flag.player_id}`}
+                href={playerProfileUrl(flag.game_slug, flag.player_id)}
                 className="text-white hover:text-brand transition-colors font-semibold"
               >
                 {formatPlayerName(flag.player_id)}
@@ -89,7 +89,7 @@ function FlagCardComponent({ flag }: FlagCardProps) {
         {/* View Incident Link */}
         <div className="pt-2">
           <Link
-            href={`/player/${flag.game_slug}/${flag.player_id}#incident-${flag.incident_id}`}
+            href={`/incident/${flag.incident_id}`}
             className="text-sm text-brand hover:text-brand/80 transition-colors"
           >
             View Original Incident →

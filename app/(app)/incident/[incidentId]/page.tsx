@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { createSupabaseServer, createSupabaseAdmin } from '../../../../lib/supabase/server'
 import { CATEGORY_COLORS } from '../../../../lib/constants/colors'
 import { tierFromScore } from '../../../../lib/reputation'
-import { formatPlayerName } from '../../../../lib/utils/player'
+import { formatPlayerName, playerProfileUrl } from '../../../../lib/utils/player'
 import { Card } from '../../../../components/ui/card'
 import { Badge } from '../../../../components/ui/badge'
 import { IncidentFlagButton } from '../../../../components/features/incident/IncidentFlagButton'
@@ -127,7 +127,7 @@ export default async function IncidentDetailPage({ params }: Props) {
           <Link href="/browse" className="hover:text-white transition-colors">Browse</Link>
           <span>/</span>
           <Link
-            href={`/player/${game.slug}/${encodeURIComponent(player.identifier)}`}
+            href={playerProfileUrl(game.slug, player.identifier)}
             className="hover:text-white transition-colors"
           >
             {formatPlayerName(player.display_name || player.identifier)}
@@ -215,7 +215,7 @@ export default async function IncidentDetailPage({ params }: Props) {
           <div className="flex items-center justify-between">
             <div>
               <Link
-                href={`/player/${game.slug}/${encodeURIComponent(player.identifier)}`}
+                href={playerProfileUrl(game.slug, player.identifier)}
                 className="text-xl font-bold text-white hover:text-brand transition-colors"
               >
                 {formatPlayerName(player.display_name || player.identifier)}
@@ -250,7 +250,7 @@ export default async function IncidentDetailPage({ params }: Props) {
         {/* Actions */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link
-            href={`/player/${game.slug}/${encodeURIComponent(player.identifier)}`}
+            href={playerProfileUrl(game.slug, player.identifier)}
             className="text-sm text-white/50 hover:text-white transition-colors flex items-center gap-1"
           >
             ← View full player profile

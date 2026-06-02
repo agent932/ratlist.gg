@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
+import { formatPlayerName, playerProfileUrl } from '@/lib/utils/player'
 
 interface PlayerSuggestion {
   identifier: string
@@ -61,17 +62,15 @@ export function PlayerSearchAutocomplete() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (query.trim()) {
-      // If we have suggestions, use the first one's game, otherwise default to tarkov
       const gameSlug = suggestions.length > 0 ? suggestions[0].game_slug : 'tarkov'
-      window.location.href = `/player/${gameSlug}/${encodeURIComponent(query.trim())}`
+      window.location.href = playerProfileUrl(gameSlug, query.trim())
     }
   }
 
   const handleSuggestionClick = (suggestion: PlayerSuggestion) => {
-    setQuery(suggestion.identifier)
+    setQuery(formatPlayerName(suggestion.identifier))
     setIsOpen(false)
-    // Use the game_slug from the suggestion
-    window.location.href = `/player/${suggestion.game_slug}/${encodeURIComponent(suggestion.identifier)}`
+    window.location.href = playerProfileUrl(suggestion.game_slug, suggestion.identifier)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -139,7 +138,7 @@ export function PlayerSearchAutocomplete() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium text-white truncate">
-                        {suggestion.display_name || suggestion.identifier}
+                        {formatPlayerName(suggestion.display_name || suggestion.identifier)}
                       </span>
                       <span className="text-xs px-1.5 py-0.5 rounded bg-brand/20 text-brand/80 shrink-0">
                         {suggestion.game_name}

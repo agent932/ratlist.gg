@@ -3,7 +3,7 @@ import { memo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
-import { formatPlayerName } from '@/lib/utils/player';
+import { formatPlayerName, playerProfileUrl } from '@/lib/utils/player';
 import { SEVERITY_COLORS, STATUS_COLORS } from '@/lib/constants/colors';
 import { DisputeResponseForm } from './DisputeResponseForm';
 
@@ -42,7 +42,7 @@ function IncidentCardComponent({ incident, showModerationInfo = false, showDispu
                 {incident.game_name}
               </Badge>
               <Link
-                href={`/player/${incident.game_slug}/${incident.player_id}`}
+                href={playerProfileUrl(incident.game_slug, incident.player_id)}
                 className="text-white hover:text-brand transition-colors font-semibold"
               >
                 {formatPlayerName(incident.player_id)}
