@@ -17,8 +17,11 @@ export async function GET(request: NextRequest) {
 
   const gameSlug = searchParams.get('game');
   const playerIdentifier = searchParams.get('player');
-  const status = searchParams.get('status') || 'active'; // Default to active incidents
-  const limit = parseInt(searchParams.get('limit') || '50');
+  // Always enforce active-only for this public endpoint — the RLS policy allows
+  // all status values (USING true), so we must enforce it at application layer.
+  // Hidden/removed incidents must never be readable by unauthenticated callers.
+  const status = 'active';
+  const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
 
   if (!gameSlug || !playerIdentifier) {
     return NextResponse.json(
