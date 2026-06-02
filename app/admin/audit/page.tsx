@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/auth/guards'
-import { createSupabaseServer } from '@/lib/supabase/server'
+import { createSupabaseAdmin } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/card'
 import type { ModerationLog } from '@/lib/types'
 
@@ -55,11 +55,12 @@ async function getAuditLogs(
   to?: string,
   limit = 100
 ): Promise<AuditLogWithModerator[]> {
-  const supabase = await createSupabaseServer()
+  // Use admin client to bypass RLS — audit logs are admin-only
+  const supabase = createSupabaseAdmin()
 
   let query = supabase
     .from('moderation_logs')
-    .select(`*, moderator:user_profiles!moderation_logs_moderator_id_fkey(display_name, role)`)
+    .select(`*, moderator:user_profiles(display_name, role)`)
     .order('created_at', { ascending: false })
     .limit(limit)
 
