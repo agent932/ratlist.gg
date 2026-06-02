@@ -108,7 +108,7 @@ export async function PATCH(
       .from('flags')
       .update(updateData)
       .eq('id', flagId)
-      .select()
+      .select('id, incident_id, resolution')
       .single()
 
     if (error) {
@@ -123,6 +123,41 @@ export async function PATCH(
       return NextResponse.json({ error: 'Flag not found' }, { status: 404 })
     }
 
+    // Map resolution to audit log action
+    const actionMap: Record<string, string> = {
+      dismissed: 'dismiss_flag',
+      removed_incident: 'remove_via_flag',
+      warned_reporter: 'warn_reporter',
+    }
+    const logAction = resolution ? actionMap[resolution] : 'dismiss_flag'
+
+    // Write audit log entry
+    await supabase.from('moderation_logs').insert({
+      moderator_id: currentUser.id,
+      action: logAction,
+      target_type: 'flag',
+      target_id: flagId,
+      metadata: { incident_id: data.incident_id, resolution: data.resolution },
+    })
+
+    // If removing via flag, also update the incident status and log that separately
+    if (resolution === 'removed_incident' && data.incident_id) {
+      await supabase.from('incidents').update({
+        status: 'removed',
+        moderated_by: currentUser.id,
+        moderated_at: new Date().toISOString(),
+        moderation_reason: 'Removed via flag review',
+      }).eq('id', data.incident_id)
+
+      await supabase.from('moderation_logs').insert({
+        moderator_id: currentUser.id,
+        action: 'remove_incident',
+        target_type: 'incident',
+        target_id: data.incident_id,
+        reason: 'Removed via flag review',
+        metadata: { flag_id: flagId },
+      })
+    }
 
     return NextResponse.json({
       success: true,
