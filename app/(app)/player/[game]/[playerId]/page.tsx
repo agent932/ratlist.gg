@@ -31,7 +31,7 @@ const PAGE_SIZE = 10
 
 type Props = { params: Promise<{ game: string; playerId: string }>; searchParams: Promise<{ page?: string }> }
 
-export const revalidate = 180
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { game, playerId } = await params
