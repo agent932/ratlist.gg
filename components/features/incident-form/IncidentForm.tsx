@@ -4,6 +4,22 @@ import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { validateEmbarkID, EMBARK_ID_GAMES } from '@/lib/validation/player-id'
+import { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+
+const CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  cheating: 'Using hacks, aimbots, wall hacks, or any third-party software to gain an unfair advantage.',
+  scamming: 'Deceiving another player for in-game items, currency, or services.',
+  betrayal: 'Killing or harming teammates without justification in a co-op or squad context.',
+  griefing: 'Intentionally disrupting another player\'s experience without competitive reason.',
+  'stream-sniping': 'Watching a streamer\'s broadcast to gain information about their in-game location.',
+  'extract-camping': 'Waiting at extraction points specifically to kill players who are trying to leave.',
+  'team-violation': 'Breaking team rules, friendly fire, or other violations of squad conduct.',
+  toxicity: 'Verbal abuse, hate speech, or sustained harassment in chat or voice.',
+  teaming: 'Coordinating with enemy players in a solo/FFA mode for mutual benefit.',
+  'friendly-fire': 'Repeatedly shooting or damaging teammates in a way that is clearly intentional.',
+  'clutch-save': 'Exceptional positive play — saving a teammate or the team from a difficult situation.',
+  helpful: 'Going out of their way to assist other players, share resources, or improve the experience.',
+}
 
 type Game = { id: string; slug: string; name: string }
 type Category = { id: number; slug: string; label: string }
@@ -157,23 +173,42 @@ export function IncidentForm({ games, categories }: Props) {
         )}
       </div>
 
-      <div>
-        <label htmlFor="category-select" className="block text-sm font-medium mb-1">
-          Incident category
-        </label>
-        <select 
-          id="category-select"
-          name="category_id" 
-          required 
-          aria-required="true"
-          className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 outline-none ring-brand/50 focus:ring"
-        >
-          <option value="">Select category</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.label}</option>
-          ))}
-        </select>
-      </div>
+      <fieldset>
+        <legend className="block text-sm font-medium mb-2">Incident category <span className="text-red-400">*</span></legend>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2" role="radiogroup" aria-required="true">
+          {categories.map((c) => {
+            const desc = CATEGORY_DESCRIPTIONS[c.slug]
+            return (
+              <TooltipProvider key={c.id} delayDuration={300}>
+                <TooltipRoot>
+                  <TooltipTrigger asChild>
+                    <label className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-2 cursor-pointer hover:bg-white/5 hover:border-white/20 transition-colors has-[:checked]:border-brand/60 has-[:checked]:bg-brand/10">
+                      <input
+                        type="radio"
+                        name="category_id"
+                        value={c.id}
+                        required
+                        className="accent-brand shrink-0"
+                      />
+                      <span className="text-sm text-white/80 leading-tight">{c.label}</span>
+                      {desc && (
+                        <svg className="h-3.5 w-3.5 text-white/30 shrink-0 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )}
+                    </label>
+                  </TooltipTrigger>
+                  {desc && (
+                    <TooltipContent side="top" className="max-w-xs">
+                      {desc}
+                    </TooltipContent>
+                  )}
+                </TooltipRoot>
+              </TooltipProvider>
+            )
+          })}
+        </div>
+      </fieldset>
 
       <div>
         <label htmlFor="occurred-at" className="block text-sm font-medium mb-1">
