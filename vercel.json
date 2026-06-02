@@ -10,7 +10,7 @@
     },
     {
       "path": "/api/cron/send-admin-alerts",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 * * * *"
     }
   ]
 }
